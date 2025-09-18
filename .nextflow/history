@@ -1,0 +1,7 @@
+2025-09-18 20:42:36	2.5s	boring_kare	ERR	8c2176397bdb43b5bb3b44bae20a5735	90121fd3-1ac6-4852-8531-8beaa72661ac	nextflow run main.nf
+2025-09-18 20:44:12	2s	zen_rutherford	ERR	8c2176397bdb43b5bb3b44bae20a5735	4fa7c612-b0b3-4b52-94be-2d888062d228	nextflow run main.nf
+2025-09-18 20:44:37	2.5s	desperate_ochoa	ERR	8c2176397bdb43b5bb3b44bae20a5735	e336c1c9-ca73-45c2-ad5d-68f7e0bd8f4c	nextflow run main.nf
+2025-09-18 20:47:41	-	cranky_wozniak	-	8c2176397bdb43b5bb3b44bae20a5735	77af3ef4-2f08-4df3-8507-7120aacbe55f	nextflow run main.nf
+2025-09-18 20:53:49	-	adoring_kalam	-	8c2176397bdb43b5bb3b44bae20a5735	be8ab2d6-17fb-48b7-901c-ce20a4e84866	nextflow run main.nf
+2025-09-18 20:59:28	-	high_lavoisier	-	8c2176397bdb43b5bb3b44bae20a5735	50d4af68-2968-4c56-86be-5d3443f3a407	nextflow run main.nf
+2025-09-18 21:05:13	1m 33s	boring_lattes	OK	8c2176397bdb43b5bb3b44bae20a5735	61bab8ff-15a9-44a0-8263-2c7f70a8073e	nextflow run main.nf
