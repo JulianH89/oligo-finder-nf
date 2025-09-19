@@ -13,10 +13,10 @@ nextflow.enable.dsl=2
 log.info """
          O L I G O T I E - RNAi Oligo Finder
          ===================================
-         Reference Dir  : ${params.bowtie_index_dir}
-         Index Prefix   : ${params.bowtie_index_prefix}
+         Run ID         : ${params.run_id}
+         Reference      : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
          Oligo Files    : ${params.oligos}
-         Mismatches     : ${params.max_mismatch}
+         Max Mismatches : ${params.max_mismatch}
          Output Dir     : ${params.outdir}
          """
          .stripIndent()
@@ -31,22 +31,21 @@ workflow {
 
     // Create a channel that emits the path to the Bowtie index.
     Channel
-        .fromPath(params.bowtie_index_dir, checkIfExists: true)
-        .set { ch_bowtie_index_dir }
+        .of([ file(params.bowtie_index_dir, checkIfExists: true), params.bowtie_index_prefix ])
+        .set { ch_bowtie_index }
 
     // Create a channel for the oligo sequences.
     Channel
-        .fromFilePairs(params.oligos)
-        .ifEmpty { error "Cannot find any fasta files matching: ${params.oligos}" }
+        .fromPath(params.oligos, checkIfExists: true)
         .set { ch_oligos }
 
 
     // Call the BOWTIE_ALIGN module.
     // The inputs are provided in the order they are defined in the module's 'input' block.
     BOWTIE_ALIGN (
+        params.run_id,
         ch_oligos,
-        ch_bowtie_index_dir,
-        params.bowtie_index_prefix,
+        ch_bowtie_index,
         params.max_mismatch
     )
 
