@@ -36,6 +36,7 @@ log.info """
          Run ID         : ${params.run_id}
          Reference      : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
          Oligo Files    : ${params.oligos}
+         Oligo Length   : ${params.'oligo_length'}
          Max Mismatches : ${params.max_mismatch}
          Output Dir     : ${params.outdir}
          """

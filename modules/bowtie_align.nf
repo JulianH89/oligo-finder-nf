@@ -18,8 +18,11 @@ process BOWTIE_ALIGN {
     def output_sam = "${oligo.baseName}.sam"
     def bowtie_index_path = "${index_dir}/${index_prefix}"
 
+    // Bowtie command to perform the alignment.
+    // Allowing up to 'max_mismatch' mismatches.
+    // The --norc option is used to prevent alignment to the reverse complement strand.
     """
-    bowtie --threads $threads --quiet -a \
+    bowtie --threads ${threads} --quiet -a --norc \
         ${bowtie_index_path} \
         -f ${oligo} \
         -S ${output_sam} \
