@@ -35,7 +35,7 @@ log.info """
          ===================================
          Run ID         : ${params.run_id}
          Reference      : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-         Oligo Files    : ${params.oligos}
+         Oligo File     : ${params.oligos}
          Oligo Length   : ${params.'oligo_length'}
          Max Mismatches : ${params.max_mismatch}
          Output Dir     : ${params.outdir}
@@ -45,6 +45,7 @@ log.info """
 
 // --- MODULES ---
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
+include { PARSE_SAM }    from './modules/parse_sam'
 
 
 // --- WORKFLOW ---
@@ -64,8 +65,7 @@ workflow {
         .set { ch_oligos }
 
 
-    // Call the BOWTIE_ALIGN module.
-    // The inputs are provided in the order they are defined in the module's 'input' block.
+    // 1. Align the oligo sequences.
     BOWTIE_ALIGN (
         params.run_id,
         ch_oligos,
@@ -73,6 +73,12 @@ workflow {
         params.max_mismatch
     )
 
-    // Log the output of the alignment process for easy viewing.
-    BOWTIE_ALIGN.out.sam.view()
+    // 2. Parse the SAM file into a structured JSON format
+    PARSE_SAM (
+        params.run_id,
+        BOWTIE_ALIGN.out.sam
+    )
+
+    // Log the final JSON output path for easy viewing.
+    PARSE_SAM.out.json.view()
 }

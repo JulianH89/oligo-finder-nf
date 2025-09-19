@@ -5,7 +5,7 @@ process BOWTIE_ALIGN {
     container 'biocontainers/bowtie:v1.2.2dfsg-4-deb_cv1'
 
     input:
-    val run_id                          // The run ID for tagging and output directory
+    val run_id
     path oligo
     tuple path(index_dir), val(index_prefix)
     val max_mismatch                    // The value for the -v parameter
