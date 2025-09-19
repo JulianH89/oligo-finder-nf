@@ -1,6 +1,6 @@
 process PARSE_SAM {
     tag "$run_id"
-    publishDir "${params.outdir}/parsed_result/${run_id}", mode: 'copy'
+    publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
     container 'python:3.10-slim'
 

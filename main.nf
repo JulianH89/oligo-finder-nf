@@ -46,6 +46,7 @@ log.info """
 // --- MODULES ---
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
+include { GENERATE_REPORT }   from './modules/generate_report'
 
 
 // --- WORKFLOW ---
@@ -79,6 +80,12 @@ workflow {
         BOWTIE_ALIGN.out.sam
     )
 
-    // Log the final JSON output path for easy viewing.
-    PARSE_SAM.out.json.view()
+    // 3. Generate the final TSV report from the JSON file
+    GENERATE_REPORT (
+        params.run_id,
+        PARSE_SAM.out.json
+    )
+
+    // Log the final report path for easy viewing.
+    GENERATE_REPORT.out.tsv.view()
 }
