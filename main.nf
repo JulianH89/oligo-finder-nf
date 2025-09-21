@@ -15,8 +15,8 @@ def validate_params() {
     if (!params.run_id) {
         error "ERROR: A run ID must be provided using --run_id <ID>"
     }
-    if (!params.target_gene_fasta) {
-        error "ERROR: A target gene FASTA must be provided using --target_gene_fasta <path/to/file.fa>"
+    if (!params.target_gene) {
+        error "ERROR: A target gene FASTA must be provided using --target_gene <path/to/file.fa>"
     }
     if (!params.bowtie_index_dir) {
         error "ERROR: A Bowtie index directory must be provided using --bowtie_index_dir <path/to/dir>"
@@ -33,14 +33,16 @@ def validate_params() {
 log.info """
          O L I G O T I E - RNAi Oligo Finder
          ===================================
-         Run ID         : ${params.run_id}
-         Reference      : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-         Target Gene    : ${params.target_gene_fasta}
-         Oligo Length   : ${params.oligo_length}
-         5' Offset      : ${params.offset_5_prime}
-         3' Offset      : ${params.offset_3_prime}
-         Max Mismatches : ${params.max_mismatch}
-         Output Dir     : ${params.outdir}
+         Run ID             : ${params.run_id}
+         Reference          : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
+         Target Gene        : ${params.target_gene_fasta}
+         Oligo Length       : ${params.oligo_length}
+         5' Offset          : ${params.offset_5_prime}
+         3' Offset          : ${params.offset_3_prime}
+         GC Range           : ${params.min_gc}% - ${params.max_gc}%
+         Forbidden Motifs   : ${params.forbidden_motifs}
+         Max Mismatches     : ${params.max_mismatch}
+         Output Dir         : ${params.outdir}
          """
          .stripIndent()
 
@@ -66,10 +68,13 @@ workflow {
     // 0. Generate oligo candidates from the target gene
     GENERATE_OLIGO_CANDIDATE (
         params.run_id,
-        file(params.target_gene_fasta, checkIfExists: true),
+        file(params.target_gene, checkIfExists: true),
         params.oligo_length,
         params.offset_5_prime,
-        params.offset_3_prime
+        params.offset_3_prime,
+        params.min_gc,
+        params.max_gc,
+        params.forbidden_motifs
     )
 
     // 1. Align the oligo sequences.
@@ -93,3 +98,4 @@ workflow {
     )
 
 }
+

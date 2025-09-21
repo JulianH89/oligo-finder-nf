@@ -10,6 +10,9 @@ process GENERATE_OLIGO_CANDIDATE {
     val oligo_length
     val offset_5
     val offset_3
+    val min_gc
+    val max_gc
+    val forbidden_motifs
 
     output:
     path "${target_gene.baseName}.oligos.fa", emit: oligos_fasta
@@ -22,6 +25,9 @@ process GENERATE_OLIGO_CANDIDATE {
         --output-fasta ${output_fasta} \\
         --oligo-length ${oligo_length} \\
         --offset-5 ${offset_5} \\
-        --offset-3 ${offset_3}
+        --offset-3 ${offset_3} \\
+        --min-gc ${min_gc} \\
+        --max-gc ${max_gc} \\
+        --forbidden-motifs "${forbidden_motifs}"
     """
 }
