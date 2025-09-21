@@ -15,8 +15,8 @@ def validate_params() {
     if (!params.run_id) {
         error "ERROR: A run ID must be provided using --run_id <ID>"
     }
-    if (!params.oligos) {
-        error "ERROR: A query file must be provided using --oligos <path/to/file.fa>"
+    if (!params.target_gene_fasta) {
+        error "ERROR: A target gene FASTA must be provided using --target_gene_fasta <path/to/file.fa>"
     }
     if (!params.bowtie_index_dir) {
         error "ERROR: A Bowtie index directory must be provided using --bowtie_index_dir <path/to/dir>"
@@ -24,8 +24,8 @@ def validate_params() {
     if (!params.bowtie_index_prefix) {
         error "ERROR: A Bowtie index prefix must be provided using --bowtie_index_prefix <prefix>"
     }
-    if (!params.max_mismatch) {
-        error "ERROR: A maximum number of mismatches must be provided using --max_mismatch <int>"
+    if (!params.oligo_length) {
+        error "ERROR: An oligo length must be provided using --oligo_length <int>"
     }
 }
 
@@ -35,8 +35,10 @@ log.info """
          ===================================
          Run ID         : ${params.run_id}
          Reference      : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-         Oligo File     : ${params.oligos}
-         Oligo Length   : ${params.'oligo_length'}
+         Target Gene    : ${params.target_gene_fasta}
+         Oligo Length   : ${params.oligo_length}
+         5' Offset      : ${params.offset_5_prime}
+         3' Offset      : ${params.offset_3_prime}
          Max Mismatches : ${params.max_mismatch}
          Output Dir     : ${params.outdir}
          """
@@ -44,6 +46,7 @@ log.info """
 
 
 // --- MODULES ---
+include { GENERATE_OLIGO_CANDIDATE } from './modules/generate_oligo_candidate'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_REPORT }   from './modules/generate_report'
@@ -60,17 +63,20 @@ workflow {
         .of([ file(params.bowtie_index_dir, checkIfExists: true), params.bowtie_index_prefix ])
         .set { ch_bowtie_index }
 
-    // Create a channel for the oligo sequences.
-    Channel
-        .fromPath(params.oligos, checkIfExists: true)
-        .set { ch_oligos }
-
+    // 0. Generate oligo candidates from the target gene
+    GENERATE_OLIGO_CANDIDATE (
+        params.run_id,
+        file(params.target_gene_fasta, checkIfExists: true),
+        params.oligo_length,
+        params.offset_5_prime,
+        params.offset_3_prime
+    )
 
     // 1. Align the oligo sequences.
     BOWTIE_ALIGN (
         params.run_id,
-        ch_oligos,
         ch_bowtie_index,
+        GENERATE_OLIGO_CANDIDATE.out.oligos_fasta,
         params.max_mismatch
     )
 
@@ -86,6 +92,4 @@ workflow {
         PARSE_SAM.out.json
     )
 
-    // Log the final report path for easy viewing.
-    GENERATE_REPORT.out.tsv.view()
 }
