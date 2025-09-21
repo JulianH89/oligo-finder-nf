@@ -2,7 +2,7 @@ process BOWTIE_ALIGN {
     tag "$run_id - Bowtie Alignment"
     publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
-    container 'biocontainers/bowtie:v1.2.2dfsg-4-deb_cv1'
+    container 'biocontainers/bowtie:v1.1.2_cv4'
 
     input:
     val run_id

@@ -2,7 +2,7 @@ process PARSE_SAM {
     tag "$run_id - Parse SAM File"
     publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
-    container 'python:3.10-slim'
+    container 'python:3.10'
 
     input:
     val run_id

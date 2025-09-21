@@ -2,7 +2,7 @@ process GENERATE_REPORT {
     tag "$run_id - Generate Report"
     publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
-    container 'python:3.10-slim'
+    container 'python:3.10'
 
     input:
     val run_id
