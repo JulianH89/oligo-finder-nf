@@ -1,5 +1,5 @@
 process BOWTIE_ALIGN {
-    tag "$run_id"
+    tag "$run_id - Bowtie Alignment"
     publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
     container 'biocontainers/bowtie:v1.2.2dfsg-4-deb_cv1'

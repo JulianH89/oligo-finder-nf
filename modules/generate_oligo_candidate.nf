@@ -1,5 +1,5 @@
 process GENERATE_OLIGO_CANDIDATE {
-    tag "$run_id"
+    tag "$run_id - Generate Oligo Candidates"
     publishDir "${params.outdir}/${run_id}", mode: 'copy'
 
     container 'python:3.10-slim'
