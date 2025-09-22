@@ -24,22 +24,22 @@ def parse_sam_file(sam_file_path):
                 continue
 
             fields = line.strip().split('\t')
-            
+
             if len(fields) < 11:
                 continue
 
             oligo_id = fields[0]
             accession = fields[2]
             sequence = fields[9]
-            
+
             # --- OPTIMIZATION 1: Faster Tag Lookup ---
             # Instead of looping, create a dictionary of the optional tags for instant lookup.
             tags = {tag.split(':')[0]: tag.split(':')[-1] for tag in fields[11:]}
-            
+
             num_mismatches_str = tags.get('NM')
             if not num_mismatches_str:
                 continue
-            
+
             try:
                 num_mismatches = int(num_mismatches_str)
             except ValueError:
@@ -59,12 +59,11 @@ def parse_sam_file(sam_file_path):
             oligos[oligo_id]['mismatches'][num_mismatches]['accessions'].add(accession)
 
     # Convert sets back to lists for JSON compatibility and convert defaultdicts
-    for oligo_id, data in oligos.items():
-        converted_mismatches = {}
-        for mismatch_level, mismatch_data in data['mismatches'].items():
-            converted_mismatches[mismatch_level] = {
-                'accessions': list(mismatch_data['accessions'])
-            }
+    for data in oligos.values():
+        converted_mismatches = {
+            mismatch_level: {'accessions': list(mismatch_data['accessions'])}
+            for mismatch_level, mismatch_data in data['mismatches'].items()
+        }
         data['mismatches'] = converted_mismatches
 
     return oligos

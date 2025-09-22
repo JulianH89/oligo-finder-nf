@@ -35,7 +35,7 @@ log.info """
          ===================================
          Run ID             : ${params.run_id}
          Reference          : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-         Target Gene        : ${params.target_gene_fasta}
+         Target Gene        : ${params.target_gene}
          Oligo Length       : ${params.oligo_length}
          5' Offset          : ${params.offset_5_prime}
          3' Offset          : ${params.offset_3_prime}
@@ -48,10 +48,12 @@ log.info """
 
 
 // --- MODULES ---
+include { SPLIT_FASTA } from './modules/split_fasta'
 include { GENERATE_OLIGO_CANDIDATE } from './modules/generate_oligo_candidate'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_REPORT }   from './modules/generate_report'
+
 
 
 // --- WORKFLOW ---
@@ -60,40 +62,42 @@ workflow {
     // Validate parameters at the start of the workflow.
     validate_params()
 
-    // Create a channel that emits the path to the Bowtie index.
-    Channel
-        .of([ file(params.bowtie_index_dir, checkIfExists: true), params.bowtie_index_prefix ])
-        .set { ch_bowtie_index }
+    // 0. Split the multi-fasta file into a channel of single-gene fasta files
+    SPLIT_FASTA(
+        file(params.target_gene, checkIfExists: true)
+    )
 
-    // 0. Generate oligo candidates from the target gene
+    // Take the channel of files from SPLIT_FASTA and transform it into the tuple format.
+    SPLIT_FASTA.out.fasta_files
+        .flatten()
+        .map { file -> tuple(file.baseName, file) }
+        .set { ch_genes }
+
+
+    // Create a value tuple for the Bowtie index
+    def bowtie_index_tuple = tuple (
+            file(params.bowtie_index_dir, checkIfExists: true), 
+            params.bowtie_index_prefix
+        )
+
+
+    // 1. Generate oligo candidates from each target gene in parallel
     GENERATE_OLIGO_CANDIDATE (
-        params.run_id,
-        file(params.target_gene, checkIfExists: true),
-        params.oligo_length,
-        params.offset_5_prime,
-        params.offset_3_prime,
-        params.min_gc,
-        params.max_gc,
-        params.forbidden_motifs
+        ch_genes
     )
 
-    // 1. Align the oligo sequences.
+    // 2. Align the oligo sequences for each gene.
     BOWTIE_ALIGN (
-        params.run_id,
-        ch_bowtie_index,
-        GENERATE_OLIGO_CANDIDATE.out.oligos_fasta,
-        params.max_mismatch
+        GENERATE_OLIGO_CANDIDATE.out.oligos_fasta
     )
 
-    // 2. Parse the SAM file into a structured JSON format
+    // 3. Parse the SAM file for each gene into a structured JSON format
     PARSE_SAM (
-        params.run_id,
         BOWTIE_ALIGN.out.sam
     )
 
-    // 3. Generate the final TSV report from the JSON file
+    // 4. Generate the final TSV report for each gene from the JSON file
     GENERATE_REPORT (
-        params.run_id,
         PARSE_SAM.out.json
     )
 

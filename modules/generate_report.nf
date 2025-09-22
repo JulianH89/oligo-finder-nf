@@ -1,12 +1,11 @@
 process GENERATE_REPORT {
-    tag "$run_id - Generate Report"
-    publishDir "${params.outdir}/${run_id}", mode: 'copy'
+    tag "${params.run_id} - $gene_id - Generate Report"
+    publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     container 'python:3.10'
 
     input:
-    val run_id
-    path json_file
+    tuple val(gene_id), path(json_file)
 
     output:
     path "${json_file.baseName}.tsv", emit: tsv

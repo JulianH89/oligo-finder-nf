@@ -1,21 +1,14 @@
 process GENERATE_OLIGO_CANDIDATE {
-    tag "$run_id - Generate Oligo Candidates"
-    publishDir "${params.outdir}/${run_id}", mode: 'copy'
+    tag "${params.run_id} - $gene_id - Generate Oligo Candidates"
+    publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     container 'python:3.10'
 
     input:
-    val run_id
-    path target_gene
-    val oligo_length
-    val offset_5
-    val offset_3
-    val min_gc
-    val max_gc
-    val forbidden_motifs
+    tuple val(gene_id), path(target_gene)
 
     output:
-    path "${target_gene.baseName}.oligos.fa", emit: oligos_fasta
+    tuple val(gene_id), path("${target_gene.baseName}.oligos.fa"), emit: oligos_fasta
 
     script:
     def output_fasta = "${target_gene.baseName}.oligos.fa"
@@ -23,11 +16,11 @@ process GENERATE_OLIGO_CANDIDATE {
     generate_oligo_candidate.py \\
         --input-fasta ${target_gene} \\
         --output-fasta ${output_fasta} \\
-        --oligo-length ${oligo_length} \\
-        --offset-5 ${offset_5} \\
-        --offset-3 ${offset_3} \\
-        --min-gc ${min_gc} \\
-        --max-gc ${max_gc} \\
-        --forbidden-motifs "${forbidden_motifs}"
+        --oligo-length ${params.oligo_length} \\
+        --offset-5 ${params.offset_5_prime} \\
+        --offset-3 ${params.offset_3_prime} \\
+        --min-gc ${params.min_gc} \\
+        --max-gc ${params.max_gc} \\
+        --forbidden-motifs "${params.forbidden_motifs}"
     """
 }
