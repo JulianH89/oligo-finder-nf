@@ -71,8 +71,8 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 | `oligo_length` | Integer | `16` | The desired length of the oligo candidates to be generated. |
 | `offset_5_prime` | Integer | `0` | Number of bases to trim from the 5' end of the target gene sequence before generating oligos. |
 | `offset_3_prime` | Integer | `0` | Number of bases to trim from the 3' end of the target gene sequence. |
-| `min_gc` | Float | `40` | The minimum allowed GC content percentage for an oligo candidate. |
-| `max_gc` | Float | `60` | The maximum allowed GC content percentage for an oligo candidate. |
+| `min_gc` | Float | `40.0` | The minimum allowed GC content percentage for an oligo candidate. |
+| `max_gc` | Float | `60.0` | The maximum allowed GC content percentage for an oligo candidate. |
 | `forbidden_motifs` | String | `GGG` | A comma-separated list of motifs that are not allowed in oligo candidates (e.g., `"GGG,AAAA"`). |
 
 ### Alignment Parameters
@@ -86,13 +86,13 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 To run the pipeline, execute the following command from the root directory of the project:
 
 ```bash
-nextflow run main.nf -profile docker
+nextflow run main.nf
 ```
 
 You can override any parameter from the command line using a double-dash prefix:
 
 ```bash
-nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
+nextflow run main.nf --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
 ```
 
 ## Output
