@@ -104,10 +104,10 @@ The final report is a tab-separated file with the following columns:
 
 This pipeline relies on the following core tools:
 
-- **Nextflow** for workflow management.
+- **Nextflow**: Workflow management.
 
-- **Bowtie** for short read alignment.
+- **Bowtie**: Short read alignment.
 
-- **Python** for data processing scripts.
+- **Python**: Data processing scripts.
 
-- **Docker** for containerization.
+- **Docker**: Containerization.
