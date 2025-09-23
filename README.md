@@ -49,6 +49,38 @@ cd OLIGO-FINDER-NF
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
 
+### Core Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `run_id` | String |  | A unique name for the pipeline run. Used for organizing output. |
+| `target_gene` | String(Path) |  | Path to the input multi-FASTA file containing target genes. |
+| `outdir` | String(Path) | `$baseDir/results` | Path to the directory where all results and logs will be saved. |
+
+### Reference Genome Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `bowtie_index_dir` | String(Path) |  | Path to the directory containing the Bowtie index files. |
+| `bowtie_index_prefix` | String |  | The basename/prefix of the Bowtie index files (e.g., 'prefix' for `prefix.1.ebwt`). |
+
+### Oligo Design Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `oligo_length` | Integer | `16` | The desired length of the oligo candidates to be generated. |
+| `offset_5_prime` | Integer | `0` | Number of bases to trim from the 5' end of the target gene sequence before generating oligos. |
+| `offset_3_prime` | Integer | `0` | Number of bases to trim from the 3' end of the target gene sequence. |
+| `min_gc` | Float | `40` | The minimum allowed GC content percentage for an oligo candidate. |
+| `max_gc` | Float | `60` | The maximum allowed GC content percentage for an oligo candidate. |
+| `forbidden_motifs` | String | `GGG` | A comma-separated list of motifs that are not allowed in oligo candidates (e.g., `"GGG,AAAA"`). |
+
+### Alignment Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `max_mismatch` | Integer | `3` | The maximum number of mismatches allowed during the Bowtie alignment (`-v` parameter). |
+
 ## Usage
 
 To run the pipeline, execute the following command from the root directory of the project:

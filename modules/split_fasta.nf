@@ -1,6 +1,8 @@
 process SPLIT_FASTA {
     tag "${params.run_id} - Splitting Fasta File"
 
+    container 'ubuntu:22.04'
+
     input:
     path target_gene
 
