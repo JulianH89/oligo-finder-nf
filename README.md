@@ -38,3 +38,76 @@ To run this pipeline, you will need:
 git clone <https://github.com/JulianH89/oligo-finder-nf.git>
 cd OLIGO-FINDER-NF
 ```
+
+2. **Prepare your data**:
+
+    - **Target Genes**: FASTA file containing the genes of interest.
+
+    - **Bowtie Index**: Pre-built Bowtie index files.
+
+3. **Configure the pipeline**:
+
+Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
+
+## Usage
+
+To run the pipeline, execute the following command from the root directory of the project:
+
+```bash
+nextflow run main.nf -profile docker
+```
+
+You can override any parameter from the command line using a double-dash prefix:
+
+```bash
+nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
+```
+
+## Output
+
+The pipeline will create an output directory specified by `params.outdir` (default is `results/`). The results are organized by run ID and then by gene ID.
+
+### Directory Structure
+
+```bash
+results/
+└── <run_id>/
+    ├── <gene_A>/
+    │   ├── gene_A.oligos.fa
+    │   ├── gene_A.oligos.sam
+    │   ├── gene_A.oligos.json
+    │   └── gene_A.oligos.tsv  // Final Report for Gene A
+    │
+    ├── <gene_B>/
+    │   ├── gene_B.oligos.fa
+    │   ├── gene_B.oligos.sam
+    │   └── ...
+    │
+    └── ...
+
+```
+
+### Final Report (`.tsv` file)
+
+The final report is a tab-separated file with the following columns:
+
+| Column | Description |
+|----------|----------|
+| Oligo_id | The unique identifier for the oligo candidate. |
+| sequence | The DNA sequence of the oligo. |
+| gc_content | The GC content percentage of the oligo. |
+| mismatches | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
+| matched_accession | A comma-separated list of reference sequences the oligo matched. |
+| num_of_matched | The total count of reference sequences matched at this mismatch level. |
+
+## Core Tools
+
+This pipeline relies on the following core tools:
+
+- **Nextflow** for workflow management.
+
+- **Bowtie** for short read alignment.
+
+- **Python** for data processing scripts.
+
+- **Docker** for containerization.
