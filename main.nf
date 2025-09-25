@@ -2,11 +2,11 @@
 nextflow.enable.dsl=2
 
 /*
-========================================================================================
+==========================================================================================
     OLIGO-FINDER-NF PIPELINE
-========================================================================================
+==========================================================================================
     Pipeline for aligning potential RNAi oligos against a reference gene set using Bowtie.
-----------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------
 */
 
 // --- HELPER FUNCTION ---
@@ -31,20 +31,20 @@ def validate_params() {
 
 // --- LOG ---
 log.info """
-         O L I G O T I E - RNAi Oligo Finder
-         ===================================
-         Run ID             : ${params.run_id}
-         Reference          : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-         Target Gene        : ${params.target_gene}
-         Oligo Length       : ${params.oligo_length}
-         5' Offset          : ${params.offset_5_prime}
-         3' Offset          : ${params.offset_3_prime}
-         GC Range           : ${params.min_gc}% - ${params.max_gc}%
-         Forbidden Motifs   : ${params.forbidden_motifs}
-         Max Mismatches     : ${params.max_mismatch}
-         Output Dir         : ${params.outdir}
-         """
-         .stripIndent()
+        O L I G O T I E - RNAi Oligo Finder
+        ===================================
+        Run ID             : ${params.run_id}
+        Reference          : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
+        Target Gene        : ${params.target_gene}
+        Oligo Length       : ${params.oligo_length}
+        5' Offset          : ${params.offset_5_prime}
+        3' Offset          : ${params.offset_3_prime}
+        GC Range           : ${params.min_gc}% - ${params.max_gc}%
+        Forbidden Motifs   : ${params.forbidden_motifs}
+        Max Mismatches     : ${params.max_mismatch}
+        Output Dir         : ${params.outdir}
+        """
+        .stripIndent()
 
 
 // --- MODULES ---
@@ -62,8 +62,14 @@ workflow {
     // Validate parameters at the start of the workflow.
     validate_params()
 
+    // Create a value tuple for the Bowtie index
+    def bowtie_index_tuple = tuple (
+        file(params.bowtie_index_dir, checkIfExists: true), 
+        params.bowtie_index_prefix
+    )
+
     // 0. Split the multi-fasta file into a channel of single-gene fasta files
-    SPLIT_FASTA(
+    SPLIT_FASTA (
         file(params.target_gene, checkIfExists: true)
     )
 
@@ -72,14 +78,6 @@ workflow {
         .flatten()
         .map { file -> tuple(file.baseName, file) }
         .set { ch_genes }
-
-
-    // Create a value tuple for the Bowtie index
-    def bowtie_index_tuple = tuple (
-            file(params.bowtie_index_dir, checkIfExists: true), 
-            params.bowtie_index_prefix
-        )
-
 
     // 1. Generate oligo candidates from each target gene in parallel
     GENERATE_OLIGO_CANDIDATE (
