@@ -20,5 +20,7 @@ process GENERATE_SURROUNDING_REGION {
         --oligo-length ${params.oligo_length}
         --offset_gene_region ${params.offset_gene_region}
         --gene_region_length ${params.gene_region_length}
+        --offset_microrna ${params.offset_microrna}
+        --microrna-seed-length ${params.microrna_seed_length}
     """
 }
