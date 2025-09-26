@@ -27,29 +27,35 @@ def validate_params() {
     if (!params.oligo_length) {
         error "ERROR: An oligo length must be provided using --oligo_length <int>"
     }
+
 }
 
 // --- LOG ---
 log.info """
         O L I G O T I E - RNAi Oligo Finder
         ===================================
-        Run ID             : ${params.run_id}
-        Reference          : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-        Target Gene        : ${params.target_gene}
-        Oligo Length       : ${params.oligo_length}
-        5' Offset          : ${params.offset_5_prime}
-        3' Offset          : ${params.offset_3_prime}
-        GC Range           : ${params.min_gc}% - ${params.max_gc}%
-        Forbidden Motifs   : ${params.forbidden_motifs}
-        Max Mismatches     : ${params.max_mismatch}
-        Output Dir         : ${params.outdir}
+        Run ID                     : ${params.run_id}
+        Reference                  : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
+        Target Gene                : ${params.target_gene}
+        Surrounding Region Length  : ${params.surrounding_region_length}
+        Oligo Length               : ${params.oligo_length}
+        5' Offset                  : ${params.offset_5_prime}
+        Gene Region Offset         : ${params.offset_gene_region}
+        Gene Region Length         : ${params.gene_region_length}
+        MicroRNA Offset            : ${params.offset_microrna}
+        MicroRNA Length            : ${params.microrna_seed_length}
+        GC Range                   : ${params.min_gc}% - ${params.max_gc}%
+        Forbidden Motifs           : ${params.forbidden_motifs}
+        Max Mismatches             : ${params.max_mismatch}
+        Output Dir                 : ${params.outdir}/${params.run_id}/
+        ===================================
         """
         .stripIndent()
 
 
 // --- MODULES ---
 include { SPLIT_FASTA } from './modules/split_fasta'
-include { GENERATE_OLIGO_CANDIDATE } from './modules/generate_oligo_candidate'
+include { GENERATE_METADATA } from './modules/generate_metadata'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_REPORT }   from './modules/generate_report'
@@ -79,14 +85,14 @@ workflow {
         .map { file -> tuple(file.baseName, file) }
         .set { ch_genes }
 
-    // 1. Generate oligo candidates from each target gene in parallel
-    GENERATE_OLIGO_CANDIDATE (
+    // 1. Generate metadata and oligo candidates from each target gene in parallel
+    GENERATE_METADATA (
         ch_genes
     )
 
     // 2. Align the oligo sequences for each gene.
     BOWTIE_ALIGN (
-        GENERATE_OLIGO_CANDIDATE.out.oligos_fasta
+        GENERATE_METADATA.out.seq_metadata
     )
 
     // 3. Parse the SAM file for each gene into a structured JSON format

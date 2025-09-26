@@ -2,6 +2,7 @@
 
 import argparse
 import sys
+import pandas as pd
 
 def calculate_gc(seq):
     """Calculates the GC content of a DNA sequence."""
@@ -19,9 +20,21 @@ def convert_dna_to_rna(seq):
     """Converts a DNA sequence to an RNA sequence by replacing T with U."""
     return seq.upper().replace('T', 'U')
 
-def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_length, 
+def calc_seq_score(seq, weight_matrix):
+    """Calculates a score for the sequence based on a provided weight matrix."""
+    seq = convert_dna_to_rna(seq)
+    weight_matrix = pd.read_csv(weight_matrix, sep = '\t', index_col=0)
+    score = 0.0
+    for i, nucleotide in enumerate(seq):
+        if nucleotide in weight_matrix.columns:
+            score += weight_matrix.loc[i + 1, nucleotide]
+        else:
+            print(f"Warning: Nucleotide '{nucleotide}' at position {i} not found in weight matrix.", file=sys.stderr)
+    return score
+
+def generate_surrounding_region(input_fasta, output, surrounding_region_length, 
                     offset_5_prime, oligo_length, offset_gene_region, gene_region_length, 
-                    offset_microrna, microrna_seed_length):
+                    offset_microrna, microrna_seed_length, weight_matrix):
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
     and writes it to an output FASTA file.
@@ -47,13 +60,14 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
 
     end = len(sequence) - surrounding_region_length + 1
     
-    # --- Write to output FASTA file ---
-    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\n"
-    with open(output_fasta, 'w') as f_out:
+    # --- Write to output metadata file ---
+    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\tScore\n"
+    with open(output, 'w') as f_out:
         f_out.write(header)
         for i in range(end):
             # Extract the surrounding region
             surrounding_region = sequence[i:i + surrounding_region_length].upper()
+            score = calc_seq_score(surrounding_region, weight_matrix)
             
             # Extract the oligo and other oligo based on sequence
             oligo = surrounding_region[offset_5_prime:offset_5_prime + oligo_length]
@@ -71,7 +85,8 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
                 f"{gc_oligo:.2f}",
                 gene_region,
                 oligo_rc,
-                microrna_seed
+                microrna_seed,
+                score
             ]
 
             output_str = "\t".join(map(str, result_data)) + "\n"
@@ -81,7 +96,7 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
 def main():
     parser = argparse.ArgumentParser(description="Generate surrounding region from FASTA")
     parser.add_argument("--input-fasta", required=True, help="Input FASTA file")
-    parser.add_argument("--output-fasta", required=True, help="Output FASTA file")
+    parser.add_argument("--output", required=True, help="Output metadata file")
     parser.add_argument("--surrounding-region-length", type=int, required=True, help="Length of surrounding region")
     parser.add_argument("--offset_5_prime", type=int, required=True, help="5' offset")
     parser.add_argument("--oligo-length", type=int, required=True, help="Oligo length")
@@ -89,18 +104,20 @@ def main():
     parser.add_argument("--gene_region_length", type=int, required=True, help="Gene region length")
     parser.add_argument("--offset_microrna", type=int, required=True, help="MicroRNA offset")
     parser.add_argument("--microrna_seed_length", type=int, required=True, help="MicroRNA seed length")
+    parser.add_argument("--weight_matrix", type=str, help="Weight matrix file (optional)")
     args = parser.parse_args()
 
     generate_surrounding_region(
         args.input_fasta, 
-        args.output_fasta, 
+        args.output, 
         args.surrounding_region_length,
         args.offset_5_prime,
         args.oligo_length,
         args.offset_gene_region,
         args.gene_region_length,
         args.offset_microrna,
-        args.microrna_seed_length
+        args.microrna_seed_length,
+        args.weight_matrix
     )
 
 if __name__ == "__main__":

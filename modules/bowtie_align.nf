@@ -3,20 +3,24 @@ process BOWTIE_ALIGN {
     publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
-    tuple val(gene_id), path(oligos_fasta)
+    tuple val(gene_id), path(metadata_seq)
 
     output:
-    tuple val(gene_id), path("${oligos_fasta.baseName}.sam"), emit: sam
+    tuple val(gene_id), path("${gene_id}.sam"), emit: sam
 
     script:
     def threads = task.cpus
-    def output_sam = "${oligos_fasta.baseName}.sam"
+    def oligos_fasta = "${gene_id}_oligos.fasta"
+    def output_sam = "${gene_id}.sam"
     def bowtie_index_path = "${params.bowtie_index_dir}/${params.bowtie_index_prefix}"
 
     // Bowtie command to perform the alignment.
     // Allowing up to 'max_mismatch' mismatches.
     // The --norc option is used to prevent alignment to the reverse complement strand.
     """
+    # Extract oligo sequences from metadata file
+    awk 'NR>1 {print ">"\$1"\\n"\$3}' ${metadata_seq} > ${oligos_fasta}
+    
     bowtie --threads ${threads} --quiet -a --norc \\
         ${bowtie_index_path} \\
         -f ${oligos_fasta} \\
