@@ -3,8 +3,15 @@
 import argparse
 import sys
 
+def calculate_gc(seq):
+    """Calculates the GC content of a DNA sequence."""
+    if not seq:
+        return 0.0
+    gc_count = seq.upper().count('G') + seq.upper().count('C')
+    return (gc_count / len(seq)) * 100
 
-def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_length, offset_5_prime, oligo_length):
+def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_length, 
+                    offset_5_prime, oligo_length):
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
     and writes it to an output FASTA file.
@@ -34,8 +41,9 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
         for i in range(end):
             surrounding_region = sequence[i:i + surrounding_region_length].upper()
             oligo = surrounding_region[offset_5_prime:offset_5_prime + oligo_length]
+            gc_oligo = calculate_gc(oligo)
 
-            output_str = f"{i}\t{surrounding_region}\t{oligo}\n"
+            output_str = f"{i}\t{surrounding_region}\t{oligo}\t{gc_oligo:<.2f}\n"
             # Write the output string to the file
             f_out.write(output_str)
 
