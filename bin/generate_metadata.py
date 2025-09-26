@@ -32,9 +32,29 @@ def calc_seq_score(seq, weight_matrix):
             print(f"Warning: Nucleotide '{nucleotide}' at position {i} not found in weight matrix.", file=sys.stderr)
     return score
 
+def calc_microrna_hits(seq, microrna_seeds):
+    """Calculates the number of microRNA seed matches in the sequence."""
+    seq = convert_dna_to_rna(seq)
+    try:
+        with open(microrna_seeds, 'r') as f:
+            seeds = {line.strip().upper() for line in f if line.strip()}
+    except Exception as e:
+        print(f"Error loading microRNA seeds file: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    hit_count = 0
+    seed_length = len(next(iter(seeds))) if seeds else 0
+
+    for i in range(len(seq) - seed_length + 1):
+        subseq = seq[i:i + seed_length]
+        if subseq in seeds:
+            hit_count += 1
+
+    return hit_count
+
 def generate_surrounding_region(input_fasta, output, surrounding_region_length, 
                     offset_5_prime, oligo_length, offset_gene_region, gene_region_length, 
-                    offset_microrna, microrna_seed_length, weight_matrix):
+                    offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds):
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
     and writes it to an output FASTA file.
@@ -61,7 +81,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
     end = len(sequence) - surrounding_region_length + 1
     
     # --- Write to output metadata file ---
-    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\tScore\n"
+    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\tMicroRNA_Hits\tScore\n"
     with open(output, 'w') as f_out:
         f_out.write(header)
         for i in range(end):
@@ -77,6 +97,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
             # Generate the reverse complement of the oligo and microRNA seed
             oligo_rc = reverse_complement(oligo)
             microrna_seed = convert_dna_to_rna(oligo_rc[offset_microrna:offset_microrna + microrna_seed_length])
+            microrna_hits = calc_microrna_hits(microrna_seed, microrna_seeds)
             
             result_data = [
                 i,
@@ -86,6 +107,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
                 gene_region,
                 oligo_rc,
                 microrna_seed,
+                microrna_hits,
                 score
             ]
 
@@ -104,7 +126,8 @@ def main():
     parser.add_argument("--gene_region_length", type=int, required=True, help="Gene region length")
     parser.add_argument("--offset_microrna", type=int, required=True, help="MicroRNA offset")
     parser.add_argument("--microrna_seed_length", type=int, required=True, help="MicroRNA seed length")
-    parser.add_argument("--weight_matrix", type=str, help="Weight matrix file (optional)")
+    parser.add_argument("--weight_matrix", type=str, required=True, help="Weight matrix file")
+    parser.add_argument("--microrna_seeds", type=str, required=True, help="MicroRNA seeds file")
     args = parser.parse_args()
 
     generate_surrounding_region(
@@ -117,7 +140,8 @@ def main():
         args.gene_region_length,
         args.offset_microrna,
         args.microrna_seed_length,
-        args.weight_matrix
+        args.weight_matrix,
+        args.microrna_seeds
     )
 
 if __name__ == "__main__":
