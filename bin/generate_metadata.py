@@ -11,7 +11,7 @@ def calculate_gc(seq):
     return (gc_count / len(seq)) * 100
 
 def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_length, 
-                    offset_5_prime, oligo_length):
+                    offset_5_prime, oligo_length, offset_gene_region, gene_region_length):
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
     and writes it to an output FASTA file.
@@ -42,8 +42,9 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
             surrounding_region = sequence[i:i + surrounding_region_length].upper()
             oligo = surrounding_region[offset_5_prime:offset_5_prime + oligo_length]
             gc_oligo = calculate_gc(oligo)
+            gene_region = oligo[offset_gene_region:offset_gene_region + gene_region_length]
 
-            output_str = f"{i}\t{surrounding_region}\t{oligo}\t{gc_oligo:<.2f}\n"
+            output_str = f"{i}\t{surrounding_region}\t{oligo}\t{gc_oligo:<.2f}\t{gene_region}\n"
             # Write the output string to the file
             f_out.write(output_str)
 
@@ -54,6 +55,8 @@ def main():
     parser.add_argument("--surrounding-region-length", type=int, required=True, help="Length of surrounding region")
     parser.add_argument("--offset_5_prime", type=int, required=True, help="5' offset")
     parser.add_argument("--oligo-length", type=int, required=True, help="Oligo length")
+    parser.add_argument("--offset_gene_region", type=int, required=True, help="Gene region offset")
+    parser.add_argument("--gene_region_length", type=int, required=True, help="Gene region length")
     args = parser.parse_args()
 
     generate_surrounding_region(
@@ -61,8 +64,10 @@ def main():
         args.output_fasta, 
         args.surrounding_region_length,
         args.offset_5_prime,
-        args.oligo_length
-        )
+        args.oligo_length,
+        args.offset_gene_region,
+        args.gene_region_length
+    )
 
 if __name__ == "__main__":
     main()

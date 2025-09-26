@@ -18,5 +18,7 @@ process GENERATE_SURROUNDING_REGION {
         --surrounding-region-length ${params.surrounding_region_length} \\
         --offset_5_prime ${params.offset_5_prime}
         --oligo-length ${params.oligo_length}
+        --offset_gene_region ${params.offset_gene_region}
+        --gene_region_length ${params.gene_region_length}
     """
 }
