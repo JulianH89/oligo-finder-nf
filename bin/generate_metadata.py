@@ -46,24 +46,35 @@ def generate_surrounding_region(input_fasta, output_fasta, surrounding_region_le
         sys.exit(1)
 
     end = len(sequence) - surrounding_region_length + 1
+    
     # --- Write to output FASTA file ---
+    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\n"
     with open(output_fasta, 'w') as f_out:
-        f_out.write(f"#Index\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\n")   
+        f_out.write(header)
         for i in range(end):
             # Extract the surrounding region
             surrounding_region = sequence[i:i + surrounding_region_length].upper()
-            # Extract the oligo
+            
+            # Extract the oligo and other oligo based on sequence
             oligo = surrounding_region[offset_5_prime:offset_5_prime + oligo_length]
-            # Calculate GC content of the oligo
             gc_oligo = calculate_gc(oligo)
-            # Extract the gene region
             gene_region = oligo[offset_gene_region:offset_gene_region + gene_region_length]
-            # Generate the reverse complement of the oligo
+            
+            # Generate the reverse complement of the oligo and microRNA seed
             oligo_rc = reverse_complement(oligo)
-
             microrna_seed = convert_dna_to_rna(oligo_rc[offset_microrna:offset_microrna + microrna_seed_length])
+            
+            result_data = [
+                i,
+                surrounding_region,
+                oligo,
+                f"{gc_oligo:.2f}",
+                gene_region,
+                oligo_rc,
+                microrna_seed
+            ]
 
-            output_str = f"{i}\t{surrounding_region}\t{oligo}\t{gc_oligo:<.2f}\t{gene_region}\t{oligo_rc}\t{microrna_seed}\n"
+            output_str = "\t".join(map(str, result_data)) + "\n"
             # Write the output string to the file
             f_out.write(output_str)
 
