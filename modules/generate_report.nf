@@ -2,8 +2,6 @@ process GENERATE_REPORT {
     tag "${params.run_id} - $gene_id - Generate Report"
     publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
-    container 'python:3.10'
-
     input:
     tuple val(gene_id), path(json_file)
 

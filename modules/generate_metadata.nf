@@ -1,20 +1,18 @@
-process GENERATE_SURROUNDING_REGION {
-    tag "${params.run_id} - $gene_id - Generate Surrounding Region"
-
-    container 'python:3.10'
+process GENERATE_METADATA {
+    tag "${params.run_id} - $gene_id - Generate Metadata"
 
     input:
     tuple val(gene_id), path(target_gene)
 
     output:
-    tuple val(gene_id), path("${target_gene.baseName}.surrounding.fa"), emit: surrounding_fasta
+    tuple val(gene_id), path("${target_gene.baseName}.metadata.txt"), emit: seq_metadata
 
     script:
-    def output_fasta = "${target_gene.baseName}.surrounding.fa"
+    def seq_metadata = "${target_gene.baseName}.metadata.txt"
     """
     generate_metadata.py \\
         --input-fasta ${target_gene} \\
-        --output-fasta ${output_fasta} \\
+        --output ${seq_metadata} \\
         --surrounding-region-length ${params.surrounding_region_length} \\
         --offset_5_prime ${params.offset_5_prime}
         --oligo-length ${params.oligo_length}
@@ -22,5 +20,6 @@ process GENERATE_SURROUNDING_REGION {
         --gene_region_length ${params.gene_region_length}
         --offset_microrna ${params.offset_microrna}
         --microrna-seed-length ${params.microrna_seed_length}
+        --weight_matrix ${params.weight_matrix}
     """
 }

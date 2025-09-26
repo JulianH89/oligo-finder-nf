@@ -2,8 +2,6 @@ process BOWTIE_ALIGN {
     tag "${params.run_id} - $gene_id - Bowtie Alignment"
     publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
-    container 'biocontainers/bowtie:v1.1.2_cv4'
-
     input:
     tuple val(gene_id), path(oligos_fasta)
 
