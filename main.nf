@@ -40,8 +40,8 @@ log.info """
         Surrounding Region Length  : ${params.surrounding_region_length}
         Oligo Length               : ${params.oligo_length}
         5' Offset                  : ${params.offset_5_prime}
-        Gene Region Offset         : ${params.offset_gene_region}
-        Gene Region Length         : ${params.gene_region_length}
+        Refseq Seed Offset         : ${params.offset_refseq_seed}
+        Refseq Seed Length         : ${params.refseq_seed_length}
         MicroRNA Seeds             : ${params.microrna_seeds}
         MicroRNA Offset            : ${params.offset_microrna}
         MicroRNA Length            : ${params.microrna_seed_length}

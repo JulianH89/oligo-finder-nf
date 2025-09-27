@@ -7,10 +7,10 @@ process MERGE_RESULTS {
     path crossreactivity_report
     
     output:
-    path "${gene_id}_final_report.tsv", emit: final_report
+    path "${gene_id}_report.tsv", emit: report
 
     script:
-    def output_tsv = "${gene_id}_final_report.tsv"
+    def output_tsv = "${gene_id}_report.tsv"
     """
     merge_results.py \\
         --filtered_metadata ${filtered_metadata} \\

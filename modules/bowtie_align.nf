@@ -10,7 +10,7 @@ process BOWTIE_ALIGN {
 
     script:
     def threads = task.cpus
-    def oligos_fasta = "${gene_id}_oligos.fasta"
+    def refseq_seed_fasta = "${gene_id}_refseq_seed.fasta"
     def output_sam = "${gene_id}.sam"
     def bowtie_index_path = "${params.bowtie_index_dir}/${params.bowtie_index_prefix}"
 
@@ -19,11 +19,11 @@ process BOWTIE_ALIGN {
     // The --norc option is used to prevent alignment to the reverse complement strand.
     """
     # Extract oligo sequences from metadata file
-    awk 'NR>1 {print ">"\$1"\\n"\$3}' ${metadata_seq} > ${oligos_fasta}
+    awk 'NR>1 {print ">"\$1"\\n"\$5}' ${metadata_seq} > ${refseq_seed_fasta}
     
     bowtie --threads ${threads} --quiet -a --norc \\
         ${bowtie_index_path} \\
-        -f ${oligos_fasta} \\
+        -f ${refseq_seed_fasta} \\
         -S ${output_sam} \\
         -v ${params.max_mismatch}
     """

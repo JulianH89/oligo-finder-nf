@@ -12,13 +12,13 @@ process GENERATE_METADATA {
     def seq_metadata = "${gene_id}.metadata.tsv"
     """
     generate_metadata.py \\
-        --input-fasta ${target_gene} \\
+        --input_fasta ${target_gene} \\
         --output ${seq_metadata} \\
-        --surrounding-region-length ${params.surrounding_region_length} \\
+        --surrounding_region_length ${params.surrounding_region_length} \\
         --offset_5_prime ${params.offset_5_prime} \\
-        --oligo-length ${params.oligo_length} \\
-        --offset_gene_region ${params.offset_gene_region} \\
-        --gene_region_length ${params.gene_region_length} \\
+        --oligo_length ${params.oligo_length} \\
+        --offset_refseq_seed ${params.offset_refseq_seed} \\
+        --refseq_seed_length ${params.refseq_seed_length} \\
         --offset_microrna ${params.offset_microrna} \\
         --microrna_seed_length ${params.microrna_seed_length} \\
         --weight_matrix ${params.weight_matrix} \\

@@ -53,7 +53,7 @@ def calc_microrna_hits(seq, microrna_seeds):
     return hit_count
 
 def generate_surrounding_region(input_fasta, output, surrounding_region_length, 
-                    offset_5_prime, oligo_length, offset_gene_region, gene_region_length, 
+                    offset_5_prime, oligo_length, offset_refseq_seed, refseq_seed_length, 
                     offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds):
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
@@ -61,7 +61,6 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
     """
     # --- Read the input FASTA file ---
     sequence = ""
-    header = ""
     with open(input_fasta, 'r') as f_in:
         for line in f_in:
             if line.startswith('>'):
@@ -81,7 +80,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
     end = len(sequence) - surrounding_region_length + 1
     
     # --- Write to output metadata file ---
-    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tGene_Region\tOligo_RC\tMicroRNA_Seed\tMicroRNA_Hits\tScore\n"
+    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tRefseq_Seed\tOligo_RC\tMicroRNA_Seed\tMicroRNA_Hits\tScore\n"
     with open(output, 'w') as f_out:
         f_out.write(header)
         for i in range(end):
@@ -92,7 +91,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
             # Extract the oligo and other oligo based on sequence
             oligo = surrounding_region[offset_5_prime:offset_5_prime + oligo_length]
             gc_oligo = calculate_gc(oligo)
-            gene_region = oligo[offset_gene_region:offset_gene_region + gene_region_length]
+            refseq_seed = oligo[offset_refseq_seed:offset_refseq_seed + refseq_seed_length]
             
             # Generate the reverse complement of the oligo and microRNA seed
             oligo_rc = reverse_complement(oligo)
@@ -104,7 +103,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
                 surrounding_region,
                 oligo,
                 f"{gc_oligo:.2f}",
-                gene_region,
+                refseq_seed,
                 oligo_rc,
                 microrna_seed,
                 microrna_hits,
@@ -117,13 +116,13 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
 
 def main():
     parser = argparse.ArgumentParser(description="Generate surrounding region from FASTA")
-    parser.add_argument("--input-fasta", required=True, help="Input FASTA file")
+    parser.add_argument("--input_fasta", required=True, help="Input FASTA file")
     parser.add_argument("--output", required=True, help="Output metadata file")
-    parser.add_argument("--surrounding-region-length", type=int, required=True, help="Length of surrounding region")
+    parser.add_argument("--surrounding_region_length", type=int, required=True, help="Length of surrounding region")
     parser.add_argument("--offset_5_prime", type=int, required=True, help="5' offset")
-    parser.add_argument("--oligo-length", type=int, required=True, help="Oligo length")
-    parser.add_argument("--offset_gene_region", type=int, required=True, help="Gene region offset")
-    parser.add_argument("--gene_region_length", type=int, required=True, help="Gene region length")
+    parser.add_argument("--oligo_length", type=int, required=True, help="Oligo length")
+    parser.add_argument("--offset_refseq_seed", type=int, required=True, help="Refseq seed offset")
+    parser.add_argument("--refseq_seed_length", type=int, required=True, help="Refseq seed length")
     parser.add_argument("--offset_microrna", type=int, required=True, help="MicroRNA offset")
     parser.add_argument("--microrna_seed_length", type=int, required=True, help="MicroRNA seed length")
     parser.add_argument("--weight_matrix", type=str, required=True, help="Weight matrix file")
@@ -136,8 +135,8 @@ def main():
         args.surrounding_region_length,
         args.offset_5_prime,
         args.oligo_length,
-        args.offset_gene_region,
-        args.gene_region_length,
+        args.offset_refseq_seed,
+        args.refseq_seed_length,
         args.offset_microrna,
         args.microrna_seed_length,
         args.weight_matrix,
