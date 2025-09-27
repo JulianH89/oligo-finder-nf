@@ -6,10 +6,10 @@ process GENERATE_METADATA {
     tuple val(gene_id), path(target_gene)
 
     output:
-    tuple val(gene_id), path("${gene_id}.metadata.txt"), emit: seq_metadata
+    tuple val(gene_id), path("${gene_id}.metadata.tsv"), emit: seq_metadata
 
     script:
-    def seq_metadata = "${gene_id}.metadata.txt"
+    def seq_metadata = "${gene_id}.metadata.tsv"
     """
     generate_metadata.py \\
         --input-fasta ${target_gene} \\
@@ -21,6 +21,7 @@ process GENERATE_METADATA {
         --gene_region_length ${params.gene_region_length} \\
         --offset_microrna ${params.offset_microrna} \\
         --microrna_seed_length ${params.microrna_seed_length} \\
-        --weight_matrix ${params.weight_matrix}
+        --weight_matrix ${params.weight_matrix} \\
+        --microrna_seeds ${params.microrna_seeds}
     """
 }

@@ -42,6 +42,7 @@ log.info """
         5' Offset                  : ${params.offset_5_prime}
         Gene Region Offset         : ${params.offset_gene_region}
         Gene Region Length         : ${params.gene_region_length}
+        MicroRNA Seeds             : ${params.microrna_seeds}
         MicroRNA Offset            : ${params.offset_microrna}
         MicroRNA Length            : ${params.microrna_seed_length}
         GC Range                   : ${params.min_gc}% - ${params.max_gc}%
@@ -56,6 +57,7 @@ log.info """
 // --- MODULES ---
 include { SPLIT_FASTA } from './modules/split_fasta'
 include { GENERATE_METADATA } from './modules/generate_metadata'
+include { FILTER_METADATA } from './modules/filter_metadata'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_REPORT }   from './modules/generate_report'
@@ -90,17 +92,22 @@ workflow {
         ch_genes
     )
 
-    // 2. Align the oligo sequences for each gene.
-    BOWTIE_ALIGN (
+    // 2. Filter the metadata for each gene in parallel
+    FILTER_METADATA (
         GENERATE_METADATA.out.seq_metadata
     )
 
-    // 3. Parse the SAM file for each gene into a structured JSON format
+    // 3. Align the oligo sequences for each gene.
+    BOWTIE_ALIGN (
+        FILTER_METADATA.out.filtered_metadata
+    )
+
+    // 4. Parse the SAM file for each gene into a structured JSON format
     PARSE_SAM (
         BOWTIE_ALIGN.out.sam
     )
 
-    // 4. Generate the final TSV report for each gene from the JSON file
+    // 5. Generate the final TSV report for each gene from the JSON file
     GENERATE_REPORT (
         PARSE_SAM.out.json
     )
