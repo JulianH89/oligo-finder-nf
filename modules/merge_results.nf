@@ -7,7 +7,7 @@ process MERGE_RESULTS {
     path crossreactivity_report
     
     output:
-    path "${gene_id}_report.tsv", emit: report
+    tuple val(gene_id), path("${gene_id}_report.tsv"), emit: report
 
     script:
     def output_tsv = "${gene_id}_report.tsv"

@@ -48,6 +48,8 @@ log.info """
         GC Range                   : ${params.min_gc}% - ${params.max_gc}%
         Forbidden Motifs           : ${params.forbidden_motifs}
         Max Mismatches             : ${params.max_mismatch}
+        Sense Length               : ${params.sense_length}
+        Antisense Length           : ${params.antisense_length}
         Output Dir                 : ${params.outdir}/${params.run_id}/
         ===================================
         """
@@ -62,6 +64,7 @@ include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_CROSSREACTIVITY_REPORT }   from './modules/generate_crossreactivity_report'
 include { MERGE_RESULTS } from './modules/merge_results'
+include { CONVERT_TO_ORDER } from './modules/convert_to_order'
 
 
 
@@ -117,6 +120,11 @@ workflow {
     MERGE_RESULTS (
         FILTER_METADATA.out.filtered_metadata,
         GENERATE_CROSSREACTIVITY_REPORT.out.crossreactivity_report
+    )
+
+    // 7. Convert the final report into a synthesis order format
+    CONVERT_TO_ORDER (
+        MERGE_RESULTS.out.report
     )
 
 }
