@@ -60,7 +60,7 @@ include { GENERATE_METADATA } from './modules/generate_metadata'
 include { FILTER_METADATA } from './modules/filter_metadata'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
-include { GENERATE_REPORT }   from './modules/generate_report'
+include { GENERATE_CROSSREACTIVITY_REPORT }   from './modules/generate_crossreactivity_report'
 
 
 
@@ -108,7 +108,7 @@ workflow {
     )
 
     // 5. Generate the final TSV report for each gene from the JSON file
-    GENERATE_REPORT (
+    GENERATE_CROSSREACTIVITY_REPORT (
         PARSE_SAM.out.json
     )
 

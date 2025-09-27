@@ -22,7 +22,7 @@ def filter_microrna_hits(metadata, microrna_hits_threshold):
     """Filters sequences based on microRNA hits threshold."""
     filtered = metadata[metadata['MicroRNA_Hits'] <= microrna_hits_threshold]
     return filtered
- 
+
 def has_forbidden_motif(seq, forbidden_motifs):
     """Checks if a sequence contains any forbidden motifs."""
     return any(motif.upper() in seq for motif in forbidden_motifs)

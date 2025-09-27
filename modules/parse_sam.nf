@@ -6,10 +6,10 @@ process PARSE_SAM {
     tuple val(gene_id), path(sam_file)
 
     output:
-    tuple val(gene_id), path("${sam_file.baseName}.json"), emit: json
+    tuple val(gene_id), path("${gene_id}.json"), emit: json
 
     script:
-    def output_json = "${sam_file.baseName}.json"
+    def output_json = "${gene_id}.json"
     """
     parse_sam.py --sam ${sam_file} --output ${output_json}
     """

@@ -5,13 +5,6 @@ import json
 import sys
 from collections import defaultdict
 
-def calculate_gc_content(sequence):
-    """Calculates the GC content of a DNA sequence."""
-    if not sequence:
-        return 0.0
-    gc_count = sequence.upper().count('G') + sequence.upper().count('C')
-    return (gc_count / len(sequence)) * 100
-
 def parse_sam_file(sam_file_path):
     """
     Parses a Bowtie SAM file and structures the data as a nested dictionary.
@@ -49,22 +42,20 @@ def parse_sam_file(sam_file_path):
                 # The redundant 'oligo_id' field has been removed from this dictionary
                 oligos[oligo_id] = {
                     'sequence': sequence,
-                    'gc_content': round(calculate_gc_content(sequence), 2),
-                    # --- OPTIMIZATION 2 (MAJOR): Use a set instead of a list ---
                     # This makes checking for existing accessions much faster.
-                    'mismatches': defaultdict(lambda: {'accessions': set()})
+                    'mismatch_level': defaultdict(lambda: {'accessions': set()})
                 }
 
             # Adding to a set is extremely fast, even for thousands of items.
-            oligos[oligo_id]['mismatches'][num_mismatches]['accessions'].add(accession)
+            oligos[oligo_id]['mismatch_level'][num_mismatches]['accessions'].add(accession)
 
     # Convert sets back to lists for JSON compatibility and convert defaultdicts
     for data in oligos.values():
         converted_mismatches = {
             mismatch_level: {'accessions': list(mismatch_data['accessions'])}
-            for mismatch_level, mismatch_data in data['mismatches'].items()
+            for mismatch_level, mismatch_data in data['mismatch_level'].items()
         }
-        data['mismatches'] = converted_mismatches
+        data['mismatch_level'] = converted_mismatches
 
     return oligos
 

@@ -21,36 +21,32 @@ def generate_report(json_file_path, output_tsv_path):
         writer = csv.writer(f_out, delimiter='\t')
 
         # Write the new, corrected header
-        writer.writerow(['Oligo_id', 'sequence', 'gc_content', 'mismatches', 'matched_accession', 'num_of_matched'])
+        writer.writerow(['#ID', 'mismatch_level', 'num_of_matched_accessions', 'matched_accession'])
 
         # Iterate through each oligo in the JSON data
         for oligo_id, data in parsed_data.items():
-            sequence = data.get('sequence', 'N/A')
-            gc_content = data.get('gc_content', 0.0)
 
             # Iterate through each mismatch level for the current oligo
             # The keys are strings in JSON, so we sort them numerically
-            sorted_mismatch_levels = sorted(data.get('mismatches', {}).keys(), key=int)
+            sorted_mismatch_levels = sorted(data.get('mismatch_level', {}).keys(), key=int)
 
             for mismatch_level in sorted_mismatch_levels:
-                mismatch_info = data['mismatches'][mismatch_level]
+                mismatch_info = data['mismatch_level'][mismatch_level]
                 accessions = mismatch_info.get('accessions', [])
                 num_of_matched = len(accessions)
 
                 # Apply the rule for formatting the accession list
                 if num_of_matched > 10:
-                    matched_accession = 'too many to record'
+                    matched_accession = 'too_many_to_record'
                 else:
                     matched_accession = ','.join(accessions)
 
                 # Write the final row with the new column order
                 writer.writerow([
                     oligo_id,
-                    sequence,
-                    gc_content,
-                    mismatch_level, # This is the new 'mismatches' column
-                    matched_accession,
-                    num_of_matched
+                    mismatch_level,
+                    num_of_matched,
+                    matched_accession
                 ])
 
 def main():
