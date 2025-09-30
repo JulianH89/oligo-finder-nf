@@ -12,13 +12,15 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 1. **SPLIT_FASTA**: The input multi-FASTA file is split into individual FASTA files, one for each gene.
 
-2. **GENERATE_OLIGO_CANDIDATE**: For each gene, a set of potential oligo sequences is generated based on specified length, GC content, sequence offsets, and forbidden motifs.
+2. **GENERATE_METADATA**: For each gene, a set of sequences is generated, including surrounding sequence, oligos, reverse complement of oligos, etc.
 
-3. **BOWTIE_ALIGN**: The generated oligo candidates are aligned against a specified Bowtie index of a reference genome/transcriptome to find potential off-target matches.
+3. **FILTER_METADATA**: Filter sequences based on GC content, microRNA hits and forbidden motifs.
 
-4. **PARSE_SAM**: The raw SAM alignment output from Bowtie is parsed into a structured JSON format, aggregating matches by oligo and mismatch level.
+4. **BOWTIE_ALIGN**: The generated oligo candidates are aligned against a specified Bowtie index of a reference genome/transcriptome to find potential off-target matches.
 
-5. **GENERATE_REPORT**: The final, human-readable TSV report is generated from the JSON file, summarizing the alignment results for each oligo candidate.
+5. **PARSE_SAM**: The raw SAM alignment output from Bowtie is parsed into a structured JSON format, aggregating matches by oligo and mismatch level.
+
+6. **GENERATE_REPORT**: The final, human-readable TSV report is generated from the JSON file, summarizing the alignment results for each oligo candidate.
 
 ## Requirements
 
