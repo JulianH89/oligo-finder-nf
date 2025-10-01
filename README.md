@@ -16,16 +16,15 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 3. **FILTER_METADATA**: Filter sequences based on GC content, microRNA hits and forbidden motifs.
 
-4. **BOWTIE_ALIGN**: The generated oligo candidates are aligned against a specified Bowtie index of a reference genome/transcriptome to find potential off-target matches.
+4. **BOWTIE_ALIGN**: Align the generated refseq seeds against a reference genome/transcriptome to find off-target matches.
 
-5. **PARSE_SAM**: The raw SAM alignment output from Bowtie is parsed into a structured JSON format, aggregating matches by oligo and mismatch level.
+5. **PARSE_SAM**: Parse the SAM file for each gene into a structured JSON format.
 
-6. **GENERATE_CROSSREACTIVITY_REPORT**: The JOSN is used to generate the crossreacivity
- report of target genes.
+6. **GENERATE_CROSSREACTIVITY_REPORT**: Generate the final TSV report for each gene from the JSON file.
 
-7. **MERGE_RESULTS**: The filtered metadata file and crossreacivity report are merge to generate.
+7. **MERGE_RESULTS**: Merge the filtered sequences and cross-reactivity reports for each gene.
 
-8. **CONVERT_TO_ORDER**: The merged reports are parsed to order format.
+8. **CONVERT_TO_ORDER**: Convert the final report into a synthesis order format.
 
 ## Requirements
 
@@ -59,13 +58,18 @@ cd OLIGO-FINDER-NF
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
 
-### Core Parameters
+### Pipeline Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `run_id` | String |  | A unique name for the pipeline run. Used for organizing output. |
-| `target_gene` | String(Path) |  | Path to the input multi-FASTA file containing target genes. |
 | `outdir` | String(Path) | `$baseDir/results` | Path to the directory where all results and logs will be saved. |
+
+### Target Gene Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `target_gene` | String(Path) |  | Path to the input multi-FASTA file containing target genes. |
 
 ### Reference Genome Parameters
 
@@ -74,15 +78,32 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 | `bowtie_index_dir` | String(Path) |  | Path to the directory containing the Bowtie index files. |
 | `bowtie_index_prefix` | String |  | The basename/prefix of the Bowtie index files (e.g., 'prefix' for `prefix.1.ebwt`). |
 
-### Oligo Design Parameters
+### Files Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
-| `oligo_length` | Integer | `16` | The desired length of the oligo candidates to be generated. |
-| `offset_5_prime` | Integer | `0` | Number of bases to trim from the 5' end of the target gene sequence before generating oligos. |
-| `offset_3_prime` | Integer | `0` | Number of bases to trim from the 3' end of the target gene sequence. |
+| `weight_matrix` | String(Path) |  | Path to the Weight Matrix files. |
+| `microrna_seeds` | String(Path) |  | Path to the microRNA Seeds files. |
+
+### sdRNAi Design Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `surrounding_region_length` | Integer | `45` | The desired length of the surrounding regions |
+| `oligo_length` | Integer | `20` | The desired length of the oligo candidates to be generated. |
+| `offset_5_prime` | Integer | `16` | Number of bases to trim from the 5' start of the surrounding regions. |
+| `offset_refseq_seed` | Integer | `3` | Number of bases to trim from the 5' start of the oligos. |
+| `refseq_seed_length` | Integer | `16` | The desired length of the refseq seeds to be generated. |
+| `offset_microrna` | Integer | `3` | Number of bases to trim from the 5' start of the microRNA seeds. |
+| `microrna_seed_length` | Integer | `7` | The desired length of the microRNA seeds to be generated. |
+
+### Filtering parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
 | `min_gc` | Float | `40.0` | The minimum allowed GC content percentage for an oligo candidate. |
 | `max_gc` | Float | `60.0` | The maximum allowed GC content percentage for an oligo candidate. |
+| `microrna_hits_threshold` | String | `1` | The maximum allowed microRNA hits for am oligo candidate. |
 | `forbidden_motifs` | String | `GGG` | A comma-separated list of motifs that are not allowed in oligo candidates (e.g., `"GGG,AAAA"`). |
 
 ### Alignment Parameters
@@ -90,6 +111,13 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `max_mismatch` | Integer | `3` | The maximum number of mismatches allowed during the Bowtie alignment (`-v` parameter). |
+
+### Synthesis Order Parameters
+
+| Parameter | Type | Default Value | Description |
+|----------|----------|----------|----------|
+| `sense_length` | Integer | `14` | The desired length of the sense length. |
+| `antisense_length` | Integer | `19` | The desired length of the antisense length. |
 
 ## Usage
 
@@ -102,7 +130,7 @@ nextflow run main.nf -profile docker
 You can override any parameter from the command line using a double-dash prefix:
 
 ```bash
-nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
+nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'My_New_Run'
 ```
 
 ## Output
