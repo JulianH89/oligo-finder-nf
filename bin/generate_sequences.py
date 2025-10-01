@@ -52,7 +52,7 @@ def calc_microrna_hits(seq, microrna_seeds):
 
     return hit_count
 
-def generate_surrounding_region(input_fasta, output, surrounding_region_length, 
+def generate_sequences(input_fasta, output, surrounding_region_length, 
                     offset_5_prime, oligo_length, offset_refseq_seed, refseq_seed_length, 
                     offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds):
     """
@@ -115,7 +115,7 @@ def generate_surrounding_region(input_fasta, output, surrounding_region_length,
             f_out.write(output_str)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate surrounding region from FASTA")
+    parser = argparse.ArgumentParser(description="Generate seqsuences and metadata from a FASTA file.")
     parser.add_argument("--input_fasta", required=True, help="Input FASTA file")
     parser.add_argument("--output", required=True, help="Output metadata file")
     parser.add_argument("--surrounding_region_length", type=int, required=True, help="Length of surrounding region")
@@ -129,7 +129,7 @@ def main():
     parser.add_argument("--microrna_seeds", type=str, required=True, help="MicroRNA seeds file")
     args = parser.parse_args()
 
-    generate_surrounding_region(
+    generate_sequences(
         args.input_fasta, 
         args.output, 
         args.surrounding_region_length,

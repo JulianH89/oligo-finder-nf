@@ -1,19 +1,19 @@
-process GENERATE_METADATA {
-    tag "${params.run_id} - $gene_id - Generate Metadata"
+process GENERATE_SEQS {
+    tag "${params.run_id} - $gene_id - Generate Sequences"
     publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(target_gene)
 
     output:
-    tuple val(gene_id), path("${gene_id}.metadata.tsv"), emit: seq_metadata
+    tuple val(gene_id), path("${gene_id}.seqs.tsv"), emit: seq
 
     script:
-    def seq_metadata = "${gene_id}.metadata.tsv"
+    def seq = "${gene_id}.seqs.tsv"
     """
-    generate_metadata.py \\
+    generate_sequences.py \\
         --input_fasta ${target_gene} \\
-        --output ${seq_metadata} \\
+        --output ${seq} \\
         --surrounding_region_length ${params.surrounding_region_length} \\
         --offset_5_prime ${params.offset_5_prime} \\
         --oligo_length ${params.oligo_length} \\

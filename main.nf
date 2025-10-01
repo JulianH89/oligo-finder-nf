@@ -58,8 +58,8 @@ log.info """
 
 // --- MODULES ---
 include { SPLIT_FASTA } from './modules/split_fasta'
-include { GENERATE_METADATA } from './modules/generate_metadata'
-include { FILTER_METADATA } from './modules/filter_metadata'
+include { GENERATE_SEQS } from './modules/generate_seqs'
+include { FILTER_SEQS } from './modules/filter_seqs'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_CROSSREACTIVITY_REPORT }   from './modules/generate_crossreactivity_report'
@@ -92,18 +92,18 @@ workflow {
         .set { ch_genes }
 
     // 1. Generate metadata and oligo candidates from each target gene in parallel
-    GENERATE_METADATA (
+    GENERATE_SEQS (
         ch_genes
     )
 
     // 2. Filter the metadata for each gene in parallel
-    FILTER_METADATA (
-        GENERATE_METADATA.out.seq_metadata
+    FILTER_SEQS (
+        GENERATE_SEQS.out.seq
     )
 
     // 3. Align the oligo sequences for each gene.
     BOWTIE_ALIGN (
-        FILTER_METADATA.out.filtered_metadata
+        FILTER_SEQS.out.filtered_seqs
     )
 
     // 4. Parse the SAM file for each gene into a structured JSON format
@@ -116,9 +116,9 @@ workflow {
         PARSE_SAM.out.json
     )
 
-    // 6. Merge the filtered metadata and cross-reactivity reports for each gene
+    // 6. Merge the filtered sequences and cross-reactivity reports for each gene
     MERGE_RESULTS (
-        FILTER_METADATA.out.filtered_metadata,
+        FILTER_SEQS.out.filtered_seqs,
         GENERATE_CROSSREACTIVITY_REPORT.out.crossreactivity_report
     )
 
