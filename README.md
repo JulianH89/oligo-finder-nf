@@ -12,7 +12,7 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 1. **SPLIT_FASTA**: The input multi-FASTA file is split into individual FASTA files, one for each gene.
 
-2. **GENERATE_METADATA**: For each gene, a set of sequences is generated, including surrounding sequence, oligos, reverse complement of oligos, etc.
+2. **GENERATE_METADATA**: For each gene, a set of sequences is generated, including surrounding sequence, oligos, refseq seeds, and reverse complement of oligos, etc.
 
 3. **FILTER_METADATA**: Filter sequences based on GC content, microRNA hits and forbidden motifs.
 
@@ -20,7 +20,12 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 5. **PARSE_SAM**: The raw SAM alignment output from Bowtie is parsed into a structured JSON format, aggregating matches by oligo and mismatch level.
 
-6. **GENERATE_REPORT**: The final, human-readable TSV report is generated from the JSON file, summarizing the alignment results for each oligo candidate.
+6. **GENERATE_CROSSREACTIVITY_REPORT**: The JOSN is used to generate the crossreacivity
+ report of target genes.
+
+7. **MERGE_RESULTS**: The filtered metadata file and crossreacivity report are merge to generate.
+
+8. **CONVERT_TO_ORDER**: The merged reports are parsed to order format.
 
 ## Requirements
 
@@ -30,7 +35,6 @@ To run this pipeline, you will need:
 
 2. **A container engine**: 
     - **Docker**: The pipeline is configured to use Docker by default. [Installation instructions](https://docs.docker.com/get-started/get-docker/)
-    - Singularity or Podman are also supported by Nextflow.
 
 ## Setup & Configuration
 
