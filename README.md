@@ -51,6 +51,10 @@ cd OLIGO-FINDER-NF
 
     - **Bowtie Index**: Pre-built Bowtie index files.
 
+    - **Weight Matrix**: Weight Matrix.
+
+    - **MicroRNA Seeds**: MicroRNA Seeds.
+
 3. **Configure the pipeline**:
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
@@ -92,13 +96,13 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 To run the pipeline, execute the following command from the root directory of the project:
 
 ```bash
-nextflow run main.nf
+nextflow run main.nf -profile docker
 ```
 
 You can override any parameter from the command line using a double-dash prefix:
 
 ```bash
-nextflow run main.nf --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
+nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'MyNewRun'
 ```
 
 ## Output
