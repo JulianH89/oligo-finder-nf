@@ -12,9 +12,9 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 1. **SPLIT_FASTA**: The input multi-FASTA file is split into individual FASTA files, one for each gene.
 
-2. **GENERATE_METADATA**: For each gene, a set of sequences is generated, including surrounding sequence, oligos, refseq seeds, and reverse complement of oligos, etc.
+2. **GENERATE_SEQS**: For each gene, a set of sequences is generated, including surrounding sequence, oligos, refseq seeds, and reverse complement of oligos, etc.
 
-3. **FILTER_METADATA**: Filter sequences based on GC content, microRNA hits and forbidden motifs.
+3. **FILTER_SEQS**: Filter sequences based on GC content, microRNA hits and forbidden motifs.
 
 4. **BOWTIE_ALIGN**: Align the generated refseq seeds against a reference genome/transcriptome to find off-target matches.
 
@@ -58,34 +58,36 @@ cd OLIGO-FINDER-NF
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
 
-### Pipeline Parameters
+### Parameters
+
+#### Pipeline Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `run_id` | String |  | A unique name for the pipeline run. Used for organizing output. |
 | `outdir` | String(Path) | `$baseDir/results` | Path to the directory where all results and logs will be saved. |
 
-### Target Gene Parameters
+#### Target Gene Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `target_gene` | String(Path) |  | Path to the input multi-FASTA file containing target genes. |
 
-### Reference Genome Parameters
+#### Reference Genome Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `bowtie_index_dir` | String(Path) |  | Path to the directory containing the Bowtie index files. |
 | `bowtie_index_prefix` | String |  | The basename/prefix of the Bowtie index files (e.g., 'prefix' for `prefix.1.ebwt`). |
 
-### Files Parameters
+#### Files Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `weight_matrix` | String(Path) |  | Path to the Weight Matrix files. |
 | `microrna_seeds` | String(Path) |  | Path to the microRNA Seeds files. |
 
-### sdRNAi Design Parameters
+#### sdRNAi Design Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
@@ -97,7 +99,7 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 | `offset_microrna` | Integer | `3` | Number of bases to trim from the 5' start of the microRNA seeds. |
 | `microrna_seed_length` | Integer | `7` | The desired length of the microRNA seeds to be generated. |
 
-### Filtering parameters
+#### Filtering parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
@@ -106,13 +108,13 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 | `microrna_hits_threshold` | String | `1` | The maximum allowed microRNA hits for am oligo candidate. |
 | `forbidden_motifs` | String | `GGG` | A comma-separated list of motifs that are not allowed in oligo candidates (e.g., `"GGG,AAAA"`). |
 
-### Alignment Parameters
+#### Alignment Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
 | `max_mismatch` | Integer | `3` | The maximum number of mismatches allowed during the Bowtie alignment (`-v` parameter). |
 
-### Synthesis Order Parameters
+#### Synthesis Order Parameters
 
 | Parameter | Type | Default Value | Description |
 |----------|----------|----------|----------|
@@ -130,7 +132,7 @@ nextflow run main.nf -profile docker
 You can override any parameter from the command line using a double-dash prefix:
 
 ```bash
-nextflow run main.nf -profile docker --target_gene 'path/to/your/genes.fa' --run_id 'My_New_Run'
+nextflow run main.nf -profile docker --run_id 'My_New_Run'
 ```
 
 ## Output
@@ -143,32 +145,55 @@ The pipeline will create an output directory specified by `params.outdir` (defau
 results/
 └── <run_id>/
     ├── <gene_A>/
-    │   ├── gene_A.oligos.fa
-    │   ├── gene_A.oligos.sam
-    │   ├── gene_A.oligos.json
-    │   └── gene_A.oligos.tsv  // Final Report for Gene A
+    │   ├── gene_A_filtered_seqs.tsv
+    │   ├── gene_A_report.tsv
+    │   ├── gene_A.crossreactivity.tsv
+    │   ├── gene_A.json
+    │   ├── gene_A.order.tsv
+    │   └── gene.seqs.tsv
     │
     ├── <gene_B>/
-    │   ├── gene_B.oligos.fa
-    │   ├── gene_B.oligos.sam
+    │   ├── gene_B_filtered_seqs.tsv
+    │   ├── gene_B_report.tsv
     │   └── ...
     │
     └── ...
 
 ```
 
-### Final Report (`.tsv` file)
+#### Explanation of output files
+
+| File name | Description |
+|----------|----------|
+| `*_filtered_seqs` |  |
+| `*_report.tsv` |  |
+| `*.crossreactivity.tsv` |  |
+| `*.json` |  |
+| `*.order.tsv` |  |
+| `*.seqs.tsv` |  |
+
+### Final Report (`.order.tsv` file)
 
 The final report is a tab-separated file with the following columns:
 
 | Column | Description |
 |----------|----------|
-| Oligo_id | The unique identifier for the oligo candidate. |
-| sequence | The DNA sequence of the oligo. |
-| gc_content | The GC content percentage of the oligo. |
-| mismatches | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
+| ID | The unique identifier for the oligo candidate. |
+| Surrounding_Region | The DNA sequence of he surrounding region. |
+| Oligo | The DNA sequence of the oligo. |
+| Oligo_RC | The DNA sequence of the reverse complement of the oligo. |
+| GC_Content | The GC content percentage of the oligo. |
+| Sense_Tripurine |  |
+| Antisense_Tripurine |  |
+| Sense_FM |  |
+| Antisense_FM |  |
+| Refseq_Seed | The DNA sequence of the refseq seed(the sequence actually map to the reference). |
+| Score | The score is calculated based on surrounding region and weight matrix. |
+| mismatch_level | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
+| num_of_matched_accessions | The total count of reference sequences matched at this mismatch level. |
+| MicroRNA_Seed | The DNA sequence of microRNA seed of the oligo. |
+| MicroRNA_Hits | The hits of the microRNA seed againt database. |
 | matched_accession | A comma-separated list of reference sequences the oligo matched. |
-| num_of_matched | The total count of reference sequences matched at this mismatch level. |
 
 ## Core Tools
 
