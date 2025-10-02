@@ -58,7 +58,7 @@ cd OLIGO-FINDER-NF
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
 
-### Parameters
+## Parameters
 
 #### Pipeline Parameters
 
