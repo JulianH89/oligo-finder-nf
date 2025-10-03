@@ -25,7 +25,7 @@ The pipeline performs the following steps for each gene in the input file, execu
 7. **MERGE_RESULTS**: Merge the filtered sequences and cross-reactivity reports for each gene.
 
 // TODO
-8. **CONVERT_TO_ORDER**:  Convert the olives into chemically-modified format for production and emerge with the final TSV report.
+8. **CONVERT_TO_ORDER**:  Convert the oligos into chemically-modified format for production and emerge with the final TSV report.
 
 ## Requirements
 
