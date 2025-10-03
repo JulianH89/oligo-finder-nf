@@ -124,7 +124,7 @@ workflow {
 
     // 7. Convert the final report into a synthesis order format
     CONVERT_TO_ORDER (
-        MERGE_RESULTS.out.report
+        MERGE_RESULTS.out.merged_result
     )
 
 }

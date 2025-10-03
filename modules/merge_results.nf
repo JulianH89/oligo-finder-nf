@@ -1,16 +1,16 @@
 process MERGE_RESULTS {
     tag "${params.run_id} - $gene_id - Merge Results"
-    publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
+    // publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(filtered_metadata)
     path crossreactivity_report
     
     output:
-    tuple val(gene_id), path("${gene_id}_report.tsv"), emit: report
+    tuple val(gene_id), path("${gene_id}_merged.tsv"), emit: merged_result
 
     script:
-    def output_tsv = "${gene_id}_report.tsv"
+    def output_tsv = "${gene_id}_merged.tsv"
     """
     merge_results.py \\
         --filtered_metadata ${filtered_metadata} \\
