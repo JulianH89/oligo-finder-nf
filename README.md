@@ -4,7 +4,7 @@
 
 `OLIGO-FINDER-NF` is a scalable, parallel bioinformatics pipeline built with Nextflow. It is designed to identify potential RNAi oligo candidates from a set of target genes and screen them for off-target effects by aligning them against a comprehensive reference genome or transcriptome.
 
-The pipeline takes a multi-FASTA file containing one or more target genes, generates candidate oligos based on user-defined criteria (length, GC content, etc.), aligns them using Bowtie, and produces a final, organized report for each gene, detailing the specificity of each oligo.
+The pipeline takes a FASTA file containing one or more target genes, generates candidate oligos based on user-defined criteria (length, GC content, etc.), aligns them using Bowtie, and produces a final, organized report for each gene, detailing the specificity of each oligo.
 
 ## Pipeline Workflow
 
@@ -24,7 +24,8 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 7. **MERGE_RESULTS**: Merge the filtered sequences and cross-reactivity reports for each gene.
 
-8. **CONVERT_TO_ORDER**: Convert the final report into a synthesis order format.
+// TODO
+8. **CONVERT_TO_ORDER**:  Convert the olives into chemically-modified format for production and emerge with the final TSV report.
 
 ## Requirements
 
@@ -165,12 +166,12 @@ results/
 
 | File name | Description |
 |----------|----------|
-| `*_filtered_seqs` |  |
-| `*_report.tsv` |  |
-| `*.crossreactivity.tsv` |  |
-| `*.json` |  |
-| `*.order.tsv` |  |
-| `*.seqs.tsv` |  |
+| `*_filtered_seqs` | Contains filtered results from `*.seqs.tsv` file by GC content, microRNA hits, forbidden motifs. |
+| `*_report.tsv` | Merged results from `*.crossreactivity.tsv` and `*_filtered_seqs`. |
+| `*.crossreactivity.tsv` | Contains the selected cross-reactivity results(matched gene accession no more than 10). Generated based on `*.json` file. |
+| `*.json` | Contains the cross-reactivity results. |
+| `*.order.tsv` | The final report. Contains the chemically-modified format for production. |
+| `*.seqs.tsv` | Contains all the sequences generated from target genes and their corresponding informations, for example GC content, Score, etc. |
 
 ### Final Report (`.order.tsv` file)
 
@@ -205,4 +206,4 @@ This pipeline relies on the following core tools:
 
 - **Python**: Data processing scripts.
 
-- **Docker**: Containerization.
+- **Docker**: Containerization. Docker bundles a pipeline and all its dependencies into a **container**, so it runs the same way anywhere — like a portable lab kit for reproducible analysis.
