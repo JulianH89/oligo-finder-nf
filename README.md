@@ -24,7 +24,6 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 7. **MERGE_RESULTS**: Merge the filtered sequences and cross-reactivity reports for each gene.
 
-// TODO
 8. **CONVERT_TO_ORDER**:  Convert the oligos into chemically-modified format for production and emerge with the final TSV report.
 
 ## Requirements
@@ -33,8 +32,7 @@ To run this pipeline, you will need:
 
 1. **Nextflow**: [Installation instructions](https://www.nextflow.io/docs/latest/install.html#installation)
 
-2. **A container engine**: 
-    - **Docker**: The pipeline is configured to use Docker by default. [Installation instructions](https://docs.docker.com/get-started/get-docker/)
+2. **Docker**: The pipeline is configured to use Docker by default. [Installation instructions](https://docs.docker.com/get-started/get-docker/)
 
 ## Setup & Configuration
 
@@ -146,16 +144,13 @@ The pipeline will create an output directory specified by `params.outdir` (defau
 results/
 └── <run_id>/
     ├── <gene_A>/
-    │   ├── gene_A_filtered_seqs.tsv
-    │   ├── gene_A_report.tsv
-    │   ├── gene_A.crossreactivity.tsv
     │   ├── gene_A.json
-    │   ├── gene_A.order.tsv
+    │   ├── gene_A.final.tsv
     │   └── gene.seqs.tsv
     │
     ├── <gene_B>/
-    │   ├── gene_B_filtered_seqs.tsv
-    │   ├── gene_B_report.tsv
+    │   ├── gene_B.json
+    │   ├── gene_B.final.tsv
     │   └── ...
     │
     └── ...
@@ -170,10 +165,10 @@ results/
 | `*_report.tsv` | Merged results from `*.crossreactivity.tsv` and `*_filtered_seqs`. |
 | `*.crossreactivity.tsv` | Contains the selected cross-reactivity results(matched gene accession no more than 10). Generated based on `*.json` file. |
 | `*.json` | Contains the cross-reactivity results. |
-| `*.order.tsv` | The final report. Contains the chemically-modified format for production. |
+| `*.final.tsv` | The final report. Contains the chemically-modified format for production. |
 | `*.seqs.tsv` | Contains all the sequences generated from target genes and their corresponding informations, for example GC content, Score, etc. |
 
-### Final Report (`.order.tsv` file)
+### Final Report (`.final.tsv` file)
 
 The final report is a tab-separated file with the following columns:
 
