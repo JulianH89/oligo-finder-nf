@@ -212,10 +212,12 @@ def convert_to_order(report_tsv, sense_length, antisense_length, output_tsv):
     'Antisense_FM',
     'Refseq_Seed',
     'Score',
-    'mismatch_level',
-    'num_of_matched_accessions',
     'MicroRNA_Seed',
     'MicroRNA_Hits',
+    'mismatch_level',
+    'num_of_matched_geneids',
+    'matched_geneid',
+    'num_of_matched_accessions',
     'matched_accession'
     ]
     df = df[new_column_order]
