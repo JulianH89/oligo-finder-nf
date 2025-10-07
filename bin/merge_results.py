@@ -5,8 +5,7 @@ import pandas as pd
 
 def load_data(file_path):
     try:
-        data = pd.read_csv(file_path, sep="\t")
-        return data
+        return pd.read_csv(file_path, sep="\t")
     except Exception as e:
         print(f"Error loading file {file_path}: {e}", file=sys.stderr)
         sys.exit(1)
