@@ -53,6 +53,8 @@ cd OLIGO-FINDER-NF
 
     - **MicroRNA Seeds**: MicroRNA Seeds.
 
+    - **Mapping of Gene ID and Gene Accession**: A mapping file which maps gene ids and their corresponding gene accesions.
+
 3. **Configure the pipeline**:
 
 Open the `nextflow.config` file and edit the `params` block to match your file locations and desired settings.
@@ -161,9 +163,6 @@ results/
 
 | File name | Description |
 |----------|----------|
-| `*_filtered_seqs` | Contains filtered results from `*.seqs.tsv` file by GC content, microRNA hits, forbidden motifs. |
-| `*_report.tsv` | Merged results from `*.crossreactivity.tsv` and `*_filtered_seqs`. |
-| `*.crossreactivity.tsv` | Contains the selected cross-reactivity results(matched gene accession no more than 10). Generated based on `*.json` file. |
 | `*.json` | Contains the cross-reactivity results. |
 | `*.final.tsv` | The final report. Contains the chemically-modified format for production. |
 | `*.seqs.tsv` | Contains all the sequences generated from target genes and their corresponding informations, for example GC content, Score, etc. |
@@ -185,11 +184,13 @@ The final report is a tab-separated file with the following columns:
 | Antisense_FM |  |
 | Refseq_Seed | The DNA sequence of the refseq seed(the sequence actually map to the reference). |
 | Score | The score is calculated based on surrounding region and weight matrix. |
-| mismatch_level | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
-| num_of_matched_accessions | The total count of reference sequences matched at this mismatch level. |
 | MicroRNA_Seed | The DNA sequence of microRNA seed of the oligo. |
 | MicroRNA_Hits | The hits of the microRNA seed againt database. |
-| matched_accession | A comma-separated list of reference sequences the oligo matched. |
+| mismatch_level | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
+| num_of_matched_geneids | The total count of matched gene ids at this mismatch level. |
+| matched_geneid | A comma-separated list of gene ids the oligo matched(record as `too_many_to_record` if the num_of_matched_geneids is greater than 10). |
+| num_of_matched_accessions | The total count of matched gene accessions at this mismatch level. |
+| matched_accession | A comma-separated list of gene accessions the oligo matched(record as `too_many_to_record` if the num_of_matched_accessions is greater than 10). |
 
 ## Core Tools
 
