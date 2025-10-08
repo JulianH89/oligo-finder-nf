@@ -7,21 +7,18 @@ import pandas as pd
 def load_seqs(seq_file):
     """Loads sequences from a TSV file into a pandas DataFrame."""
     try:
-        seqs = pd.read_csv(seq_file, sep='\t')
-        return seqs
+        return pd.read_csv(seq_file, sep='\t')
     except Exception as e:
         print(f"Error loading sequences file: {e}", file=sys.stderr)
         sys.exit(1)
 
 def filter_gc_content(seqs, min_gc, max_gc):
     """Filters sequences based on GC content range."""
-    filtered = seqs[(seqs['GC_Content'] >= min_gc) & (seqs['GC_Content'] <= max_gc)]
-    return filtered
+    return seqs[(seqs['GC_Content'] >= min_gc) & (seqs['GC_Content'] <= max_gc)]
 
 def filter_microrna_hits(seqs, microrna_hits_threshold):
     """Filters sequences based on microRNA hits threshold."""
-    filtered = seqs[seqs['MicroRNA_Hits'] <= microrna_hits_threshold]
-    return filtered
+    return seqs[seqs['MicroRNA_Hits'] <= microrna_hits_threshold]
 
 def has_forbidden_motif(seq, forbidden_motifs):
     """Checks if a sequence contains any forbidden motifs."""
@@ -29,8 +26,7 @@ def has_forbidden_motif(seq, forbidden_motifs):
 
 def filter_forbidden_motifs(seqs, forbidden_motifs):
     """Filters sequences containing any forbidden motifs."""
-    filtered = seqs[~seqs['Oligo'].apply(lambda x: has_forbidden_motif(x, forbidden_motifs))]
-    return filtered
+    return seqs[~seqs['Oligo'].apply(lambda x: has_forbidden_motif(x, forbidden_motifs))]
 
 def filter_sequences(seqs, min_gc, max_gc, microrna_hits_threshold, forbidden_motifs):
     """Applies all filters to the seqs DataFrame."""
