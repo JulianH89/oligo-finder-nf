@@ -22,6 +22,7 @@ process GENERATE_SEQS {
         --offset_microrna ${params.offset_microrna} \\
         --microrna_seed_length ${params.microrna_seed_length} \\
         --weight_matrix ${params.weight_matrix} \\
-        --microrna_seeds ${params.microrna_seeds}
+        --microrna_seeds ${params.microrna_seeds} \\
+        --cds_region ${params.cds_region}
     """
 }

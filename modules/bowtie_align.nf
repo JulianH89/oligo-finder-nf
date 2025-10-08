@@ -19,7 +19,7 @@ process BOWTIE_ALIGN {
     // The --norc option is used to prevent alignment to the reverse complement strand.
     """
     # Extract oligo sequences from metadata file
-    awk 'NR>1 {print ">"\$1"\\n"\$5}' ${metadata_seq} > ${refseq_seed_fasta}
+    awk 'NR>1 {print ">"\$1"\\n"\$6}' ${metadata_seq} > ${refseq_seed_fasta}
     
     bowtie --threads ${threads} --quiet -a --norc \\
         ${bowtie_index_path} \\

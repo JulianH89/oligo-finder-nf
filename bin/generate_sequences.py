@@ -52,19 +52,43 @@ def calc_microrna_hits(seq, microrna_seeds):
 
     return hit_count
 
+def load_cds_regions(cds_region_file):
+    """Loads CDS regions from a file into a dictionary."""
+    cds_regions = {}
+    try:
+        with open(cds_region_file, 'r') as f:
+            next(f)  # Skip header
+            for line in f:
+                parts = line.strip().split('\t')
+                if len(parts) == 3:
+                    accession, start, end = parts
+                    cds_regions[accession] = (int(start), int(end))
+    except Exception as e:
+        print(f"Error loading CDS regions file: {e}", file=sys.stderr)
+        sys.exit(1)
+    return cds_regions
+
 def generate_sequences(input_fasta, output, surrounding_region_length, 
                     offset_5_prime, oligo_length, offset_refseq_seed, refseq_seed_length, 
-                    offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds):
+                    offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds, cds_region_file):
+    # sourcery skip: low-code-quality
     """
     Reads a FASTA file, extracts the surrounding region of specified length,
     and writes it to an output FASTA file.
     """
+    # Load CDS regions
+    cds_regions = load_cds_regions(cds_region_file)
+    
     # --- Read the input FASTA file ---
     sequence = ""
+    accession = ""
     with open(input_fasta, 'r') as f_in:
         for line in f_in:
             if line.startswith('>'):
-                header = line.strip()
+                accession = line[1:].strip().split()[0]
+                if accession not in cds_regions:
+                    print(f"Error: Accession {accession} not found in CDS regions file.", file=sys.stderr)
+                    sys.exit(1)
             else:
                 sequence += line.strip()
 
@@ -80,7 +104,7 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
     end = len(sequence) - surrounding_region_length + 1
     
     # --- Write to output metadata file ---
-    header = "#ID\tSurrounding_Region\tOligo\tGC_Content\tRefseq_Seed\tOligo_RC\tMicroRNA_Seed\tMicroRNA_Hits\tScore\n"
+    header = "#ID\tSurrounding_Region\tOligo\tRegion\tGC_Content\tRefseq_Seed\tOligo_RC\tMicroRNA_Seed\tMicroRNA_Hits\tScore\n"
     with open(output, 'w') as f_out:
         f_out.write(header)
         for i in range(end):
@@ -93,6 +117,23 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
             gc_oligo = calculate_gc(oligo)
             refseq_seed = oligo[offset_refseq_seed:offset_refseq_seed + refseq_seed_length]
             
+            # Identify if the oligo overlaps with the CDS region
+            region = ""
+            cds_start, cds_end = cds_regions[accession]
+            oligo_start = i + offset_5_prime + 1  # 1-based
+            oligo_end = oligo_start + oligo_length - 1
+            # Determine the region type
+            if oligo_end < cds_start: # completely before CDS
+                region = "5UTR"
+            elif oligo_start < cds_start: # overlaps 5' UTR and CDS
+                region = "5UTR_CDS"
+            elif oligo_start <= cds_end and oligo_end > cds_end: # overlaps CDS and 3' UTR
+                region = "CDS_3UTR"
+            elif oligo_start > cds_end: # completely after CDS
+                region = "3UTR"
+            else: # completely within CDS
+                region = "CDS"
+            
             # Generate the reverse complement of the oligo and microRNA seed
             oligo_rc = reverse_complement(oligo)
             microrna_seed = convert_dna_to_rna(oligo_rc[offset_microrna:offset_microrna + microrna_seed_length])
@@ -102,6 +143,7 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
                 i,
                 surrounding_region,
                 oligo,
+                region,
                 f"{gc_oligo:.2f}",
                 refseq_seed,
                 oligo_rc,
@@ -127,6 +169,7 @@ def main():
     parser.add_argument("--microrna_seed_length", type=int, required=True, help="MicroRNA seed length")
     parser.add_argument("--weight_matrix", type=str, required=True, help="Weight matrix file")
     parser.add_argument("--microrna_seeds", type=str, required=True, help="MicroRNA seeds file")
+    parser.add_argument("--cds_region", type=str, required=True, help="CDS region file")
     args = parser.parse_args()
 
     generate_sequences(
@@ -140,7 +183,8 @@ def main():
         args.offset_microrna,
         args.microrna_seed_length,
         args.weight_matrix,
-        args.microrna_seeds
+        args.microrna_seeds,
+        args.cds_region
     )
 
 if __name__ == "__main__":

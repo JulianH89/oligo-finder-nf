@@ -26,7 +26,11 @@ def has_forbidden_motif(seq, forbidden_motifs):
 
 def filter_forbidden_motifs(seqs, forbidden_motifs):
     """Filters sequences containing any forbidden motifs."""
-    return seqs[~seqs['Oligo'].apply(lambda x: has_forbidden_motif(x, forbidden_motifs))]
+    return seqs[
+        ~seqs['Oligo'].apply(
+            lambda x: has_forbidden_motif(x, forbidden_motifs)
+        )
+    ]
 
 def filter_sequences(seqs, min_gc, max_gc, microrna_hits_threshold, forbidden_motifs):
     """Applies all filters to the seqs DataFrame."""
