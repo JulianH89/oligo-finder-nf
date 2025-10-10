@@ -1,4 +1,4 @@
-process CONVERT_TO_ORDER {
+process GENERATE_FINAL_REPORT {
     tag "${params.run_id} - $gene_id - Generate chemically-modified format"
     publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
@@ -11,7 +11,7 @@ process CONVERT_TO_ORDER {
     script:
     def output_order = "${gene_id}.final.tsv"
     """
-    convert_to_order.py \\
+    generate_final_report.py \\
         --report_tsv ${report} \\
         --output_tsv ${output_order} \\
         --sense_length ${params.sense_length} \\

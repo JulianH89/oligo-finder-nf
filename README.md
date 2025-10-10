@@ -24,7 +24,7 @@ The pipeline performs the following steps for each gene in the input file, execu
 
 7. **MERGE_RESULTS**: Merge the filtered sequences and cross-reactivity reports for each gene.
 
-8. **CONVERT_TO_ORDER**:  Convert the oligos into chemically-modified format for production and emerge with the final TSV report.
+8. **GENERATE_FINAL_REPORT**: Generate chemically-modified format of the oligos for production and emerge with the final TSV report.
 
 ## Requirements
 
@@ -141,7 +141,7 @@ nextflow run main.nf -profile docker --run_id 'My_New_Run'
 If you don't want to keep cache:
 
 ```bash
-nextflow run main.nf -profile docker -with-cleanup
+nextflow run main.nf -profile docker && nextflow cleanup
 ```
 
 ## Output

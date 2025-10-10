@@ -64,7 +64,7 @@ include { BOWTIE_ALIGN } from './modules/bowtie_align'
 include { PARSE_SAM }    from './modules/parse_sam'
 include { GENERATE_CROSSREACTIVITY_REPORT }   from './modules/generate_crossreactivity_report'
 include { MERGE_RESULTS } from './modules/merge_results'
-include { CONVERT_TO_ORDER } from './modules/convert_to_order'
+include { GENERATE_FINAL_REPORT } from './modules/generate_final_report'
 
 
 
@@ -122,8 +122,8 @@ workflow {
         GENERATE_CROSSREACTIVITY_REPORT.out.crossreactivity_report
     )
 
-    // 7. Convert the final report into a synthesis order format
-    CONVERT_TO_ORDER (
+    // 7. Generate the final report in a chemically-modified format
+    GENERATE_FINAL_REPORT (
         MERGE_RESULTS.out.merged_result
     )
 

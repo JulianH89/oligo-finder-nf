@@ -230,7 +230,7 @@ def convert_to_order(report_tsv, sense_length, antisense_length, output_tsv):
         sys.exit(1)
 
 def main():
-    parser = argparse.ArgumentParser(description="Convert oligo sequences to TriLink order format.")
+    parser = argparse.ArgumentParser(description="Generate chemically-modified format of the oligos for production and emerge with the final TSV report.")
     parser.add_argument("--report_tsv", required=True, help="Path to the input report TSV file.")
     parser.add_argument("--sense_length", type=int, default=14, help="Length of the sense strand.")
     parser.add_argument("--antisense_length", type=int, default=19, help="Length of the antisense strand.")
