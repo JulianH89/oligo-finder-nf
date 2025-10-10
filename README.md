@@ -87,6 +87,8 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 |----------|----------|----------|----------|
 | `weight_matrix` | String(Path) |  | Path to the Weight Matrix files. |
 | `microrna_seeds` | String(Path) |  | Path to the microRNA Seeds files. |
+| `geneid_accession` | String(Path) | Path to the files of Gene IDs and their Gene Accessions. |
+| `cds_region` | String(Path) | Path to the files of gene accessions and their CDS regions. |
 
 #### sdRNAi Design Parameters
 
@@ -136,6 +138,12 @@ You can override any parameter from the command line using a double-dash prefix:
 nextflow run main.nf -profile docker --run_id 'My_New_Run'
 ```
 
+If you don't want to keep cache:
+
+```bash
+nextflow run main.nf -profile docker -with-cleanup
+```
+
 ## Output
 
 The pipeline will create an output directory specified by `params.outdir` (default is `results/`). The results are organized by run ID and then by gene ID.
@@ -176,6 +184,7 @@ The final report is a tab-separated file with the following columns:
 | ID | The unique identifier for the oligo candidate. |
 | Surrounding_Region | The DNA sequence of he surrounding region. |
 | Oligo | The DNA sequence of the oligo. |
+| Region | The gene region where thee oligo locates. |
 | Oligo_RC | The DNA sequence of the reverse complement of the oligo. |
 | GC_Content | The GC content percentage of the oligo. |
 | Sense_Tripurine |  |
@@ -184,7 +193,6 @@ The final report is a tab-separated file with the following columns:
 | Antisense_FM |  |
 | Refseq_Seed | The DNA sequence of the refseq seed(the sequence actually map to the reference). |
 | Score | The score is calculated based on surrounding region and weight matrix. |
-| MicroRNA_Seed | The DNA sequence of microRNA seed of the oligo. |
 | MicroRNA_Hits | The hits of the microRNA seed againt database. |
 | mismatch_level | The number of mismatches (0, 1, 2, 3) for this alignment. The results will be displayed at field NM in SAM file. |
 | num_of_matched_geneids | The total count of matched gene ids at this mismatch level. |
