@@ -6,6 +6,26 @@
 
 The pipeline takes a FASTA file containing one or more target genes, generates candidate oligos based on user-defined criteria (length, GC content, etc.), aligns them using Bowtie, and produces a final, organized report for each gene, detailing the specificity of each oligo.
 
+## Usage
+
+To run the pipeline, execute the following command from the root directory of the project:
+
+```bash
+nextflow run main.nf -profile docker
+```
+
+You can override any parameter from the command line using a double-dash prefix:
+
+```bash
+nextflow run main.nf -profile docker --run_id 'My_New_Run'
+```
+
+If you don't want to keep cache:
+
+```bash
+nextflow run main.nf -profile docker && nextflow cleanup
+```
+
 ## Pipeline Workflow
 
 The pipeline performs the following steps for each gene in the input file, executing them in parallel whenever possible:
@@ -123,26 +143,6 @@ Open the `nextflow.config` file and edit the `params` block to match your file l
 |----------|----------|----------|----------|
 | `sense_length` | Integer | `14` | The desired length of the sense length. |
 | `antisense_length` | Integer | `19` | The desired length of the antisense length. |
-
-## Usage
-
-To run the pipeline, execute the following command from the root directory of the project:
-
-```bash
-nextflow run main.nf -profile docker
-```
-
-You can override any parameter from the command line using a double-dash prefix:
-
-```bash
-nextflow run main.nf -profile docker --run_id 'My_New_Run'
-```
-
-If you don't want to keep cache:
-
-```bash
-nextflow run main.nf -profile docker && nextflow cleanup
-```
 
 ## Output
 
