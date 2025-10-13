@@ -14,7 +14,7 @@
     if (outfile) close(outfile);
 
     # Define the new output filename based on the sanitized header.
-    outfile = header ".fa";
+    outfile = outdir "/" header ".fa";
 }
 
 # This block is executed for every line in the file.
