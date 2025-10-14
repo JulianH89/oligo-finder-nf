@@ -30,32 +30,6 @@ def validate_params() {
 
 }
 
-// --- LOG ---
-log.info """
-        O L I G O T I E - RNAi Oligo Finder
-        ===================================
-        Run ID                     : ${params.run_id}
-        Reference                  : ${params.bowtie_index_dir}/${params.bowtie_index_prefix}
-        Target Gene                : ${params.target_gene}
-        Surrounding Region Length  : ${params.surrounding_region_length}
-        Oligo Length               : ${params.oligo_length}
-        5' Offset                  : ${params.offset_5_prime}
-        Refseq Seed Offset         : ${params.offset_refseq_seed}
-        Refseq Seed Length         : ${params.refseq_seed_length}
-        MicroRNA Seeds             : ${params.microrna_seeds}
-        MicroRNA Offset            : ${params.offset_microrna}
-        MicroRNA Length            : ${params.microrna_seed_length}
-        GC Range                   : ${params.min_gc}% - ${params.max_gc}%
-        Forbidden Motifs           : ${params.forbidden_motifs}
-        Max Mismatches             : ${params.max_mismatch}
-        Sense Length               : ${params.sense_length}
-        Antisense Length           : ${params.antisense_length}
-        Output Dir                 : ${params.outdir}/${params.run_id}/
-        ===================================
-        """
-        .stripIndent()
-
-
 // --- MODULES ---
 include { SPLIT_FASTA } from './modules/split_fasta'
 include { GENERATE_SEQS } from './modules/generate_seqs'
@@ -73,6 +47,60 @@ workflow {
 
     // Validate parameters at the start of the workflow.
     validate_params()
+
+    // ===== RECORD METADATA =====
+    def metadata = [
+        run_id: params.run_id,
+        timestamp: new Date().format('yyyy-MM-dd HH:mm:ss'),
+        nextflow_version: nextflow.version.toString(),
+        workflow_session: workflow.sessionId,
+        profile: workflow.profile,
+    
+        // Reference genome parameters
+        bowtie_index_dir: params.bowtie_index_dir,
+        bowtie_index_prefix: params.bowtie_index_prefix,
+    
+        // Input files
+        target_gene: params.target_gene,
+        weight_matrix: params.weight_matrix,
+        microrna_seeds: params.microrna_seeds,
+        geneid_accession: params.geneid_accession,
+        cds_region: params.cds_region,
+    
+        // Design parameters
+        surrounding_region_length: params.surrounding_region_length,
+        oligo_length: params.oligo_length,
+        offset_5_prime: params.offset_5_prime,
+        offset_refseq_seed: params.offset_refseq_seed,
+        refseq_seed_length: params.refseq_seed_length,
+        offset_microrna: params.offset_microrna,
+        microrna_seed_length: params.microrna_seed_length,
+    
+        // Filtering parameters
+        min_gc: params.min_gc,
+        max_gc: params.max_gc,
+        microrna_hits_threshold: params.microrna_hits_threshold,
+        forbidden_motifs: params.forbidden_motifs,
+    
+        // Alignment parameters
+        max_mismatch: params.max_mismatch,
+    
+        // Synthesis parameters
+        sense_length: params.sense_length,
+        antisense_length: params.antisense_length,
+    
+        // Output directory
+        outdir: params.outdir
+    ]
+
+// Create output directory if it doesn't exist
+new File("${params.outdir}/${params.run_id}").mkdirs()
+
+// Write metadata to JSON file
+def metadata_json = file("${params.outdir}/${params.run_id}/run_metadata.json")
+metadata_json.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(metadata))
+
+// ===== END: RECORD METADATA =====
 
     // Create a value tuple for the Bowtie index
     def bowtie_index_tuple = tuple (
