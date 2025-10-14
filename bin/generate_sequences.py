@@ -8,7 +8,7 @@ def calculate_gc(seq):
     """Calculates the GC content of a DNA sequence."""
     if not seq:
         return 0.0
-    gc_count = seq.upper().count('G') + seq.upper().count('C')
+    gc_count = sum(base in ('G', 'C') for base in seq)
     return (gc_count / len(seq)) * 100
 
 def reverse_complement(seq):
@@ -20,10 +20,19 @@ def convert_dna_to_rna(seq):
     """Converts a DNA sequence to an RNA sequence by replacing T with U."""
     return seq.upper().replace('T', 'U')
 
+def load_weight_matrix(weight_matrix_file):
+    """Loads a weight matrix from a file into a pandas DataFrame."""
+    try:
+        weight_matrix = pd.read_csv(weight_matrix_file, sep='\t', index_col=0)
+    except Exception as e:
+        print(f"Error loading weight matrix file: {e}", file=sys.stderr)
+        sys.exit(1)
+    return weight_matrix
+
 def calc_seq_score(seq, weight_matrix):
     """Calculates a score for the sequence based on a provided weight matrix."""
     seq = convert_dna_to_rna(seq)
-    weight_matrix = pd.read_csv(weight_matrix, sep = '\t', index_col=0)
+    weight_matrix = load_weight_matrix(weight_matrix)
     score = 0.0
     for i, nucleotide in enumerate(seq):
         if nucleotide in weight_matrix.columns:
@@ -32,22 +41,27 @@ def calc_seq_score(seq, weight_matrix):
             print(f"Warning: Nucleotide '{nucleotide}' at position {i} not found in weight matrix.", file=sys.stderr)
     return score
 
-def calc_microrna_hits(seq, microrna_seeds):
-    """Calculates the number of microRNA seed matches in the sequence."""
-    seq = convert_dna_to_rna(seq)
+def load_microrna_seeds(microrna_seeds_file):
+    """Loads microRNA seeds from a file into a set."""
     try:
-        with open(microrna_seeds, 'r') as f:
+        with open(microrna_seeds_file, 'r') as f:
             seeds = {line.strip().upper() for line in f if line.strip()}
     except Exception as e:
         print(f"Error loading microRNA seeds file: {e}", file=sys.stderr)
         sys.exit(1)
+    return seeds
+
+def calc_microrna_hits(seq, microrna_seeds):
+    """Calculates the number of microRNA seed matches in the sequence."""
+    seq = convert_dna_to_rna(seq)
+    microrna_seeds = load_microrna_seeds(microrna_seeds)
 
     hit_count = 0
-    seed_length = len(next(iter(seeds))) if seeds else 0
+    seed_length = len(next(iter(microrna_seeds))) if microrna_seeds else 0
 
     for i in range(len(seq) - seed_length + 1):
         subseq = seq[i:i + seed_length]
-        if subseq in seeds:
+        if subseq in microrna_seeds:
             hit_count += 1
 
     return hit_count
