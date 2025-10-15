@@ -73,7 +73,7 @@ cd OLIGO-FINDER-NF
 
     - **MicroRNA Seeds**: MicroRNA Seeds.
 
-    - **Mapping of Gene ID and Gene Accession**: A mapping file which maps gene ids and their corresponding gene accesions.
+    - **Mapping of Gene ID and Gene Accession**: A mapping file which maps gene ids and their corresponding gene accessions.
 
 3. **Configure the pipeline**:
 
