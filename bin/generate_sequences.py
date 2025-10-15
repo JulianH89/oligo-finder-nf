@@ -82,7 +82,7 @@ def load_cds_regions(cds_region_file):
         sys.exit(1)
     return cds_regions
 
-def generate_sequences(input_fasta, output, surrounding_region_length, 
+def generate_sequences(input_fasta, output, gene_id, surrounding_region_length, 
                     offset_5_prime, oligo_length, offset_refseq_seed, refseq_seed_length, 
                     offset_microrna, microrna_seed_length, weight_matrix, microrna_seeds, cds_region_file):
     # sourcery skip: low-code-quality
@@ -122,6 +122,9 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
     with open(output, 'w') as f_out:
         f_out.write(header)
         for i in range(end):
+            # Generate a unique ID
+            unique_id = f"{gene_id}_{i+1}"
+            
             # Extract the surrounding region
             surrounding_region = sequence[i:i + surrounding_region_length].upper()
             score = calc_seq_score(surrounding_region, weight_matrix)
@@ -154,7 +157,7 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
             microrna_hits = calc_microrna_hits(microrna_seed, microrna_seeds)
             
             result_data = [
-                i,
+                unique_id,
                 surrounding_region,
                 oligo,
                 region,
@@ -171,8 +174,9 @@ def generate_sequences(input_fasta, output, surrounding_region_length,
             f_out.write(output_str)
 
 def main():
-    parser = argparse.ArgumentParser(description="Generate seqsuences and metadata from a FASTA file.")
+    parser = argparse.ArgumentParser(description="Generate sequences and metadata from a FASTA file.")
     parser.add_argument("--input_fasta", required=True, help="Input FASTA file")
+    parser.add_argument("--gene_id", required=True, help="Gene ID/accession")
     parser.add_argument("--output", required=True, help="Output metadata file")
     parser.add_argument("--surrounding_region_length", type=int, required=True, help="Length of surrounding region")
     parser.add_argument("--offset_5_prime", type=int, required=True, help="5' offset")
@@ -189,6 +193,7 @@ def main():
     generate_sequences(
         args.input_fasta, 
         args.output, 
+        args.gene_id,
         args.surrounding_region_length,
         args.offset_5_prime,
         args.oligo_length,

@@ -13,6 +13,7 @@ process GENERATE_SEQS {
     """
     generate_sequences.py \\
         --input_fasta ${target_gene} \\
+        --gene_id ${gene_id} \\
         --output ${seq} \\
         --surrounding_region_length ${params.surrounding_region_length} \\
         --offset_5_prime ${params.offset_5_prime} \\
