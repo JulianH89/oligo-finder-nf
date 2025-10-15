@@ -186,7 +186,7 @@ def order_oligo_antisense_fm(revcomp, antisense_length):
             
     return "PmU." + "".join(mod_nuc_parts)
 
-def convert_to_order(report_tsv, sense_length, antisense_length, output_tsv):
+def generate_final_report(report_tsv, sense_length, antisense_length, output_tsv):
     # Load the report TSV
     try:
         df = pd.read_csv(report_tsv, sep="\t")
@@ -237,7 +237,7 @@ def main():
     parser.add_argument("--output_tsv", required=True, help="Path to the output TSV file.")
     args = parser.parse_args()
     
-    convert_to_order(args.report_tsv, args.sense_length, args.antisense_length, args.output_tsv)
+    generate_final_report(args.report_tsv, args.sense_length, args.antisense_length, args.output_tsv)
 
 
 if __name__ == '__main__':
