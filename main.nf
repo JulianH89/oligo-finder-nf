@@ -93,14 +93,14 @@ workflow {
         outdir: params.outdir
     ]
 
-// Create output directory if it doesn't exist
-new File("${params.outdir}/${params.run_id}").mkdirs()
+    // Create output directory if it doesn't exist
+    new File("${params.outdir}/${params.run_id}").mkdirs()
 
-// Write metadata to JSON file
-def metadata_json = file("${params.outdir}/${params.run_id}/run_metadata.json")
-metadata_json.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(metadata))
+    // Write metadata to JSON file
+    def metadata_json = file("${params.outdir}/${params.run_id}/run_metadata.json")
+    metadata_json.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(metadata))
 
-// ===== END: RECORD METADATA =====
+    // ===== END: RECORD METADATA =====
 
     // Create a value tuple for the Bowtie index
     def bowtie_index_tuple = tuple (
