@@ -1,6 +1,5 @@
 process GENERATE_CROSSREACTIVITY_REPORT {
     tag "${params.run_id} - $gene_id - Generate Cross-Reactivity Report"
-    // publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(json_file)

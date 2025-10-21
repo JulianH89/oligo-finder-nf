@@ -1,6 +1,5 @@
 process FILTER_SEQS {
     tag "${params.run_id} - $gene_id - Filter Sequences"
-    // publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(seq)

@@ -1,6 +1,5 @@
 process BOWTIE_ALIGN {
     tag "${params.run_id} - $gene_id - Bowtie Alignment"
-    // publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(metadata_seq)

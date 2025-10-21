@@ -1,5 +1,6 @@
 process SPLIT_FASTA {
     tag "${params.run_id} - Splitting Fasta File"
+    publishDir "${params.outdir}/${params.run_id}", mode: 'copy'
 
     container 'ubuntu:22.04'
     containerOptions '-u $(id -u):$(id -g)'

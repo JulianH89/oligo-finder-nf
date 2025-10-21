@@ -1,6 +1,6 @@
 process GENERATE_SEQS {
     tag "${params.run_id} - $gene_id - Generate Sequences"
-    publishDir "${params.outdir}/${params.run_id}/${gene_id}", mode: 'copy'
+    publishDir "${params.outdir}/${params.run_id}", mode: 'copy'
 
     input:
     tuple val(gene_id), path(target_gene)
