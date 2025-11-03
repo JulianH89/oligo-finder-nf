@@ -1,6 +1,7 @@
 process PARSE_SAM {
     tag "${params.run_id} - $gene_id - Parse SAM File"
     publishDir "${params.outdir}/${params.run_id}", mode: 'copy'
+    container 'oligo-finder-env:latest'
     
     input:
     tuple val(gene_id), path(sam_file)

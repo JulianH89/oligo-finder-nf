@@ -1,5 +1,6 @@
 process FILTER_SEQS {
     tag "${params.run_id} - $gene_id - Filter Sequences"
+    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(seq)

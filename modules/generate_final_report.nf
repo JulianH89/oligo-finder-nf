@@ -1,6 +1,7 @@
 process GENERATE_FINAL_REPORT {
     tag "${params.run_id} - $gene_id - Generate chemically-modified format"
     publishDir "${params.outdir}/${params.run_id}", mode: 'copy'
+    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(report)

@@ -1,5 +1,6 @@
 process GENERATE_CROSSREACTIVITY_REPORT {
     tag "${params.run_id} - $gene_id - Generate Cross-Reactivity Report"
+    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(json_file)
