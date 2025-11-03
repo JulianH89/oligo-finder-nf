@@ -6,6 +6,7 @@ process SPLIT_FASTA {
     containerOptions '-u $(id -u):$(id -g)'
 
     input:
+    path split_script
     path target_gene
 
     output:
@@ -14,6 +15,6 @@ process SPLIT_FASTA {
     script:
     """
     mkdir -p split_fasta
-    awk -v outdir="split_fasta" -f ${baseDir}/bin/split_fasta.awk ${target_gene}
+    awk -v outdir="split_fasta" -f ${split_script} ${target_gene}
     """
 }

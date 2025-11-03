@@ -94,24 +94,19 @@ workflow {
     ]
 
     // Create output directory if it doesn't exist
-    new File("${params.outdir}/${params.run_id}").mkdirs()
+    // new File("${params.outdir}/${params.run_id}").mkdirs()
 
     // Write metadata to JSON file
-    def metadata_json = file("${params.outdir}/${params.run_id}/run_metadata.json")
+    def metadata_json = file("${params.outdir}/${params.run_id}/${params.run_id}_run_metadata.json")
     metadata_json.text = groovy.json.JsonOutput.prettyPrint(groovy.json.JsonOutput.toJson(metadata))
 
     // ===== END: RECORD METADATA =====
 
-    // Create a value tuple for the Bowtie index
-    def bowtie_index_tuple = tuple (
-        file(params.bowtie_index_dir, checkIfExists: true), 
-        params.bowtie_index_prefix
-    )
-
     // 0. Split the multi-fasta file into a channel of single-gene fasta files
-    SPLIT_FASTA (
-        file(params.target_gene, checkIfExists: true)
-    )
+    split_script_ch = channel.value(file("${baseDir}/bin/split_fasta.awk"))
+    target_gene_ch  = channel.value(file(params.target_gene, checkIfExists: true))
+
+    SPLIT_FASTA(split_script_ch, target_gene_ch)
 
     // Take the channel of files from SPLIT_FASTA and transform it into the tuple format.
     SPLIT_FASTA.out.fasta_files
