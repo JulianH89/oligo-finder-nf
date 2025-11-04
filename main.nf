@@ -33,12 +33,13 @@ def validate_params() {
 // --- MODULES ---
 include { SPLIT_FASTA } from './modules/split_fasta'
 include { GENERATE_SEQS } from './modules/generate_seqs'
-include { FILTER_SEQS } from './modules/filter_seqs'
 include { BOWTIE_ALIGN } from './modules/bowtie_align'
-include { PARSE_SAM }    from './modules/parse_sam'
-include { GENERATE_CROSSREACTIVITY_REPORT }   from './modules/generate_crossreactivity_report'
+include { PARSE_SAM } from './modules/parse_sam'
+include { GENERATE_CROSSREACTIVITY_REPORT } from './modules/generate_crossreactivity_report'
 include { MERGE_RESULTS } from './modules/merge_results'
-include { GENERATE_FINAL_REPORT } from './modules/generate_final_report'
+include { FILTER_MERGED_SEQS } from './modules/filter_merged_seqs'
+include { GENERATE_FINAL_REPORT as GENERATE_COMPLETE_REPORT } from './modules/generate_final_report'
+include { GENERATE_FINAL_REPORT as GENERATE_FILTERED_REPORT } from './modules/generate_final_report'
 
 
 
@@ -119,35 +120,42 @@ workflow {
         ch_genes
     )
 
-    // 2. Filter the metadata for each gene in parallel
-    FILTER_SEQS (
-        GENERATE_SEQS.out.seq
-    )
-
-    // 3. Align the oligo sequences for each gene.
+    // 2. Align the oligo sequences for each gene.
     BOWTIE_ALIGN (
-        FILTER_SEQS.out.filtered_seqs
+        GENERATE_SEQS.out.seqs
     )
 
-    // 4. Parse the SAM file for each gene into a structured JSON format
+    // 3. Parse the SAM file for each gene into a structured JSON format
     PARSE_SAM (
         BOWTIE_ALIGN.out.sam
     )
 
-    // 5. Generate the final TSV report for each gene from the JSON file
+    // 4. Generate the final TSV report for each gene from the JSON file
     GENERATE_CROSSREACTIVITY_REPORT (
         PARSE_SAM.out.json
     )
 
-    // 6. Merge the filtered sequences and cross-reactivity reports for each gene
+    // 5. Merge the filtered sequences and cross-reactivity reports for each gene
     MERGE_RESULTS (
-        FILTER_SEQS.out.filtered_seqs,
+        GENERATE_SEQS.out.seqs,
         GENERATE_CROSSREACTIVITY_REPORT.out.crossreactivity_report
     )
 
-    // 7. Generate the final report in a chemically-modified format
-    GENERATE_FINAL_REPORT (
+    // 6. Generate the final COMPLETE report with chemically-modified format
+    GENERATE_COMPLETE_REPORT (
+        MERGE_RESULTS.out.merged_result,
+        "complete"
+    )
+
+    // 7. Filter the merged sequences based on GC content, microRNA hits, and forbidden motifs
+    FILTER_MERGED_SEQS (
         MERGE_RESULTS.out.merged_result
+    )
+
+    // 8. Generate the final FILTERED report with chemically-modified format
+    GENERATE_FILTERED_REPORT (
+        FILTER_MERGED_SEQS.out.filtered_seqs,
+        "filtered"
     )
 
 }

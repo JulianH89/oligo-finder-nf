@@ -3,17 +3,17 @@ process MERGE_RESULTS {
     container 'oligo-finder-env:latest'
 
     input:
-    tuple val(gene_id), path(filtered_metadata)
+    tuple val(gene_id), path(metadata)
     path crossreactivity_report
     
     output:
-    tuple val(gene_id), path("${gene_id}_merged.tsv"), emit: merged_result
+    tuple val(gene_id), path("${gene_id}.compete.tsv"), emit: merged_result
 
     script:
-    def output_tsv = "${gene_id}_merged.tsv"
+    def output_tsv = "${gene_id}.compete.tsv"
     """
     merge_results.py \\
-        --filtered_metadata ${filtered_metadata} \\
+        --filtered_metadata ${metadata} \\
         --crossreactivity_report ${crossreactivity_report} \\
         --output ${output_tsv}
     """
