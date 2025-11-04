@@ -23,7 +23,7 @@ nextflow run main.nf -profile docker --run_id 'My_New_Run'
 If you don't want to keep cache:
 
 ```bash
-nextflow run main.nf -profile docker && nextflow cleanup
+nextflow run main.nf -profile docker && nextflow cleanup -f
 ```
 
 ## Pipeline Workflow
@@ -153,16 +153,11 @@ The pipeline will create an output directory specified by `params.outdir` (defau
 ```bash
 results/
 └── <run_id>/
-    ├── <gene_A>/
-    │   ├── gene_A.json
-    │   ├── gene_A.final.tsv
-    │   └── gene.seqs.tsv
-    │
-    ├── <gene_B>/
-    │   ├── gene_B.json
-    │   ├── gene_B.final.tsv
-    │   └── ...
-    │
+    ├── gene_A.json
+    ├── gene_A.final.tsv
+    ├── gene_A.seqs.tsv
+    ├── gene_B.json
+    ├── gene_B.final.tsv
     └── ...
 
 ```
