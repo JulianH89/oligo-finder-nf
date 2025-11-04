@@ -8,14 +8,14 @@ process GENERATE_FINAL_REPORT {
     val report_type
 
     output:
-    path "${gene_id}.${report_type}.final.tsv", emit: final_report
+    path "${gene_id}.${report_type}.final.xlsx", emit: final_report
 
     script:
-    def output_order = "${gene_id}.${report_type}.final.tsv"
+    def output_order = "${gene_id}.${report_type}.final.xlsx"
     """
     generate_final_report.py \\
         --report_tsv ${report} \\
-        --output_tsv ${output_order} \\
+        --output_xlsx ${output_order} \\
         --sense_length ${params.sense_length} \\
         --antisense_length ${params.antisense_length}
     """

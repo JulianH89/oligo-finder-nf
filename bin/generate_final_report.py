@@ -186,7 +186,7 @@ def order_oligo_antisense_fm(revcomp, antisense_length):
             
     return "PmU." + "".join(mod_nuc_parts)
 
-def generate_final_report(report_tsv, sense_length, antisense_length, output_tsv):
+def generate_final_report(report_tsv, sense_length, antisense_length, output_xlsx):
     # Load the report TSV
     try:
         df = pd.read_csv(report_tsv, sep="\t")
@@ -224,9 +224,9 @@ def generate_final_report(report_tsv, sense_length, antisense_length, output_tsv
 
     # Save the updated DataFrame to the output TSV
     try:
-        df.to_csv(output_tsv, sep="\t", index=False)
+        df.to_excel(output_xlsx, index=False, engine='openpyxl')
     except Exception as e:
-        print(f"Error saving file {output_tsv}: {e}", file=sys.stderr)
+        print(f"Error saving file {output_xlsx}: {e}", file=sys.stderr)
         sys.exit(1)
 
 def main():
@@ -234,10 +234,10 @@ def main():
     parser.add_argument("--report_tsv", required=True, help="Path to the input report TSV file.")
     parser.add_argument("--sense_length", type=int, default=14, help="Length of the sense strand.")
     parser.add_argument("--antisense_length", type=int, default=19, help="Length of the antisense strand.")
-    parser.add_argument("--output_tsv", required=True, help="Path to the output TSV file.")
+    parser.add_argument("--output_xlsx", required=True, help="Path to the output XLSX file.")
     args = parser.parse_args()
-    
-    generate_final_report(args.report_tsv, args.sense_length, args.antisense_length, args.output_tsv)
+
+    generate_final_report(args.report_tsv, args.sense_length, args.antisense_length, args.output_xlsx)
 
 
 if __name__ == '__main__':
