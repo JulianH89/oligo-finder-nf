@@ -17,7 +17,7 @@ def load_sequence(input_fasta):
     return seq.upper()
 
 
-def calculate_accessibility(input_fasta, output, winsize, span, ulength):
+def calculate_accessibility(input_fasta, output, winsize, span, ulength, surrounding_region_length, oligo_length, offset_5_prime):
     """Calculates the target accessibility of a RNA sequence using RNAplfold."""
     
     ## Load sequence
@@ -31,11 +31,14 @@ def calculate_accessibility(input_fasta, output, winsize, span, ulength):
     for i in range(ulength, len(pl_matrix)):
         if i >= ulength:
             accessibility = pl_matrix[i][ulength]
-            results.append((i - ulength + 1, accessibility))
-
+            results.append(accessibility)
+            
+    results = results[offset_5_prime:-(surrounding_region_length - oligo_length - offset_5_prime)]
+    
     with open(output, "w") as out_f:
-        for position, accessibility in results:
-            out_f.write(f"{position}\t{accessibility:.6f}\n")
+        out_f.write("Accessibility\n")
+        for accessibility in results:
+            out_f.write(f"{accessibility:.6f}\n")
     
 
 
@@ -46,10 +49,13 @@ def main():
     parser.add_argument("--winsize", type=int, default=70, help="Window size for RNAplfold.")
     parser.add_argument("--span", type=int, default=50, help="Span for RNAplfold.")
     parser.add_argument("--ulength", type=int, default=20, help="Maximum length of unpaired regions.")
+    parser.add_argument("--surrounding_region_length", type=int, help="Length of surrounding region.")
+    parser.add_argument("--oligo_length", type=int, help="Length of oligo.")
+    parser.add_argument("--offset_5_prime", type=int, help="Offset for 5' end of oligo.")
 
     args = parser.parse_args()
 
-    calculate_accessibility(args.input_fasta, args.output, args.winsize, args.span, args.ulength)
+    calculate_accessibility(args.input_fasta, args.output, args.winsize, args.span, args.ulength, args.surrounding_region_length, args.oligo_length, args.offset_5_prime)
 
 if __name__ == "__main__":
     main()
