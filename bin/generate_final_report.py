@@ -213,6 +213,7 @@ def generate_final_report(report_tsv, sense_length, antisense_length, output_xls
     'Antisense_FM',
     'Refseq_Seed',
     'Score',
+    'Target_Accessibility',
     'MicroRNA_Hits',
     'mismatch_level',
     'num_of_matched_geneids',

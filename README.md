@@ -11,6 +11,10 @@ The pipeline takes a FASTA file containing one or more target genes, generates c
 To run the pipeline, execute the following command from the root directory of the project:
 
 ```bash
+docker build -t oligo-finder-env:latest -f Dockerfile .
+```
+
+```bash
 nextflow run main.nf -profile docker
 ```
 

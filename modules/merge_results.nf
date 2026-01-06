@@ -4,6 +4,7 @@ process MERGE_RESULTS {
 
     input:
     tuple val(gene_id), path(metadata)
+    path target_accessibility
     path crossreactivity_report
     
     output:
@@ -14,6 +15,7 @@ process MERGE_RESULTS {
     """
     merge_results.py \\
         --filtered_metadata ${metadata} \\
+        --target_accessibility ${target_accessibility} \\
         --crossreactivity_report ${crossreactivity_report} \\
         --output ${output_tsv}
     """

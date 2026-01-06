@@ -2,8 +2,6 @@
 
 import RNA
 import argparse
-import sys
-
 
 def load_sequence(input_fasta):
     """Loads a RNA sequence."""
@@ -17,7 +15,8 @@ def load_sequence(input_fasta):
     return seq.upper()
 
 
-def calculate_accessibility(input_fasta, output, winsize, span, ulength, surrounding_region_length, oligo_length, offset_5_prime):
+def calculate_accessibility(gene_id, input_fasta, output, winsize, span, ulength, surrounding_region_length, oligo_length, offset_5_prime):
+    # sourcery skip: avoid-builtin-shadow
     """Calculates the target accessibility of a RNA sequence using RNAplfold."""
     
     ## Load sequence
@@ -36,14 +35,17 @@ def calculate_accessibility(input_fasta, output, winsize, span, ulength, surroun
     results = results[offset_5_prime:-(surrounding_region_length - oligo_length - offset_5_prime)]
     
     with open(output, "w") as out_f:
-        out_f.write("Accessibility\n")
-        for accessibility in results:
-            out_f.write(f"{accessibility:.6f}\n")
+        out_f.write("#ID\tAccessibility\n")
+        for i in range(len(results)):
+            id = f"{gene_id}_{i+1}"
+            accessibility = results[i]
+            out_f.write(f"{id}\t{accessibility:.6f}\n")
     
 
 
 def main():
     parser = argparse.ArgumentParser(description="Calculate target accessibility of RNA sequences.")
+    parser.add_argument("--gene_id", type=str, help="Gene ID/accession.")
     parser.add_argument("--input_fasta", type=str, help="target gene sequence to analyze.")
     parser.add_argument("--output", type=str, help="Output file to save accessibility results.")
     parser.add_argument("--winsize", type=int, default=70, help="Window size for RNAplfold.")
@@ -55,7 +57,7 @@ def main():
 
     args = parser.parse_args()
 
-    calculate_accessibility(args.input_fasta, args.output, args.winsize, args.span, args.ulength, args.surrounding_region_length, args.oligo_length, args.offset_5_prime)
+    calculate_accessibility(args.gene_id, args.input_fasta, args.output, args.winsize, args.span, args.ulength, args.surrounding_region_length, args.oligo_length, args.offset_5_prime)
 
 if __name__ == "__main__":
     main()

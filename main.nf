@@ -40,6 +40,7 @@ include { MERGE_RESULTS } from './modules/merge_results'
 include { FILTER_MERGED_SEQS } from './modules/filter_merged_seqs'
 include { GENERATE_FINAL_REPORT as GENERATE_COMPLETE_REPORT } from './modules/generate_final_report'
 include { GENERATE_FINAL_REPORT as GENERATE_FILTERED_REPORT } from './modules/generate_final_report'
+include { CALCULATE_TARGET_ACCESSIBILITY } from './modules/calculate_target_accessibility'
 
 
 
@@ -89,6 +90,11 @@ workflow {
         // Synthesis parameters
         sense_length: params.sense_length,
         antisense_length: params.antisense_length,
+
+        // RNAplfold parameters
+        plfold_winsize: params.plfold_winsize,
+        plfold_span: params.plfold_span,
+        plfold_ulength: params.plfold_ulength,
     
         // Output directory
         outdir: params.outdir
@@ -120,6 +126,11 @@ workflow {
         ch_genes
     )
 
+    // Add target accessibility calculation step
+    CALCULATE_TARGET_ACCESSIBILITY (
+        ch_genes
+    )
+
     // 2. Align the oligo sequences for each gene.
     BOWTIE_ALIGN (
         GENERATE_SEQS.out.seqs
@@ -138,6 +149,7 @@ workflow {
     // 5. Merge the filtered sequences and cross-reactivity reports for each gene
     MERGE_RESULTS (
         GENERATE_SEQS.out.seqs,
+        CALCULATE_TARGET_ACCESSIBILITY.out.target_accessibility,
         GENERATE_CROSSREACTIVITY_REPORT.out.crossreactivity_report
     )
 
