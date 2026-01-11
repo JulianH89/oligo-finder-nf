@@ -22,9 +22,6 @@ def merge_results(filtered_metadata_path, crossreactivity_report_path, target_ac
     # Merge with target accessibility data
     merged = pd.merge(merged, target_accessibility, on="#ID", how="left")
 
-    # Rename the column to match expected name
-    merged = merged.rename(columns={"Accessibility": "Target_Accessibility"})
-
     # Save the merged DataFrame to the output file
     merged.to_csv(output_path, sep="\t", index=False)
 

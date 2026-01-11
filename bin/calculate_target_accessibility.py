@@ -35,7 +35,7 @@ def calculate_accessibility(gene_id, input_fasta, output, winsize, span, ulength
     results = results[offset_5_prime:-(surrounding_region_length - oligo_length - offset_5_prime)]
     
     with open(output, "w") as out_f:
-        out_f.write("#ID\tAccessibility\n")
+        out_f.write("#ID\tTarget_Accessibility\n")
         for i in range(len(results)):
             id = f"{gene_id}_{i+1}"
             accessibility = results[i]

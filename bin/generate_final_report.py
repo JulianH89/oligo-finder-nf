@@ -199,6 +199,8 @@ def generate_final_report(report_tsv, sense_length, antisense_length, output_xls
     df['Antisense_Tripurine'] = df['Oligo_RC'].replace("U", "T").apply(lambda x: order_oligo_antisense(x, antisense_length))
     df['Sense_FM'] = df['Oligo'].replace("U", "T").apply(lambda x: order_oligo_sense_fm(x, sense_length))
     df['Antisense_FM'] = df['Oligo_RC'].replace("U", "T").apply(lambda x: order_oligo_antisense_fm(x, antisense_length))
+    df['Target_Accessibility'] = df['Target_Accessibility'].apply(lambda x: f"{x:.2e}" if pd.notnull(x) else x)
+
     
     new_column_order = [
     '#ID',
