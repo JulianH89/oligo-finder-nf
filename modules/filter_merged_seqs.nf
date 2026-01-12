@@ -1,6 +1,5 @@
 process FILTER_MERGED_SEQS {
     tag "${params.run_id} - $gene_id - Filter Merged Sequences"
-    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(merged_seq)

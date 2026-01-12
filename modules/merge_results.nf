@@ -1,6 +1,5 @@
 process MERGE_RESULTS {
     tag "${params.run_id} - $gene_id - Merge Results"
-    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(metadata)

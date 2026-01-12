@@ -1,6 +1,5 @@
 process CALCULATE_TARGET_ACCESSIBILITY {
     tag "${params.run_id} - $gene_id - Calculate Target Accessibility"
-    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(target_gene)

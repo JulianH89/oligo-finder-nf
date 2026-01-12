@@ -1,6 +1,5 @@
 process BOWTIE_ALIGN {
     tag "${params.run_id} - $gene_id - Bowtie Alignment"
-    container 'oligo-finder-env:latest'
 
     input:
     tuple val(gene_id), path(metadata_seq)
